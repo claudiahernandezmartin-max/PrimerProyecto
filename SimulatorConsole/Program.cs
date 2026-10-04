@@ -104,6 +104,7 @@ namespace SimulatorConsole
                 list.EscribeConsola();
 
 
+
                 Console.ReadLine();
             }
             catch (FormatException) 
