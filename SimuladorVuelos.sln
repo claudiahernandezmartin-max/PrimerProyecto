@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32819.101
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12217.157 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightLib", "FlightLib\FlightLib.csproj", "{3B53FCD9-7A68-42EF-A9DA-B0628F94A07E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorConsole", "SimulatorConsole\SimulatorConsole.csproj", "{3A87A27D-F5E9-4F8E-B229-683005A87FF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorForms", "SimulatorForms\SimulatorForms.csproj", "{A70B6C1C-6606-43FE-8DF2-A488A3F3FF6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3A87A27D-F5E9-4F8E-B229-683005A87FF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A87A27D-F5E9-4F8E-B229-683005A87FF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A87A27D-F5E9-4F8E-B229-683005A87FF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A70B6C1C-6606-43FE-8DF2-A488A3F3FF6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A70B6C1C-6606-43FE-8DF2-A488A3F3FF6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A70B6C1C-6606-43FE-8DF2-A488A3F3FF6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A70B6C1C-6606-43FE-8DF2-A488A3F3FF6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
