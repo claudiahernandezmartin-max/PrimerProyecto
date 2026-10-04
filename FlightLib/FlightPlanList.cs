@@ -37,7 +37,7 @@ namespace FlightLib
             int i = 0;
             while (i < number)
             {
-                vector[i].Mover(tiempo);
+                vector[i].Move(tiempo);
                 i++;
             }
         }

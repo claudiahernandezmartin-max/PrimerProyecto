@@ -71,7 +71,7 @@ namespace SimulatorConsole
 
                 //Fem el bucle de moure i escriure el pla de vol
                 int i = 0;
-                int ciclos = 15;
+                int ciclos = 25;
                 int tiempoCiclo = 10;
                 double distanciaSeguridad = 10;
 
@@ -92,11 +92,17 @@ namespace SimulatorConsole
                     list.Mover(tiempoCiclo);
                     list.EscribeConsola();
                     //Això significa no m'importa quans hik ha dins del vector, perque se que el codi esta dins de la classe llsita.
-                  
+
                     if (plan_a.Conflicto(plan_b,distanciaSeguridad))
                     Console.WriteLine("Conflicto detectado");
                     i++;
                 }
+                
+                Console.WriteLine("----- RESTART -----");
+                plan_a.Restart();
+                plan_b.Restart();
+                list.EscribeConsola();
+
 
                 Console.ReadLine();
             }
