@@ -25,5 +25,14 @@ namespace SimulatorForms
             f.SetLista(lista);
             f.ShowDialog();
         }
+
+        private void simulacionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FlightPlan plan1 = lista.GetFlightPlan(0);
+            FlightPlan plan2 = lista.GetFlightPlan(1);
+
+            Simulation f = new Simulation(plan1, plan2);
+            f.ShowDialog();
+        }
     }
 }
