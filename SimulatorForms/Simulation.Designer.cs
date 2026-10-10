@@ -1,6 +1,6 @@
 ﻿namespace SimulatorForms
 {
-    partial class Simulation
+    partial class FlightDataForm
     {
         /// <summary>
         /// Required designer variable.
@@ -34,6 +34,8 @@
             this.buttonIniciar = new System.Windows.Forms.Button();
             this.buttonDetener = new System.Windows.Forms.Button();
             this.timerSimulacion = new System.Windows.Forms.Timer(this.components);
+            this.buttonVerDatos = new System.Windows.Forms.Button();
+            this.Conflicte = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // panelSimulacion
@@ -49,7 +51,7 @@
             // 
             // buttonMover
             // 
-            this.buttonMover.Location = new System.Drawing.Point(539, 33);
+            this.buttonMover.Location = new System.Drawing.Point(539, 12);
             this.buttonMover.Name = "buttonMover";
             this.buttonMover.Size = new System.Drawing.Size(135, 54);
             this.buttonMover.TabIndex = 1;
@@ -59,7 +61,7 @@
             // 
             // buttonIniciar
             // 
-            this.buttonIniciar.Location = new System.Drawing.Point(539, 152);
+            this.buttonIniciar.Location = new System.Drawing.Point(539, 91);
             this.buttonIniciar.Name = "buttonIniciar";
             this.buttonIniciar.Size = new System.Drawing.Size(135, 56);
             this.buttonIniciar.TabIndex = 2;
@@ -70,7 +72,7 @@
             // buttonDetener
             // 
             this.buttonDetener.Enabled = false;
-            this.buttonDetener.Location = new System.Drawing.Point(539, 247);
+            this.buttonDetener.Location = new System.Drawing.Point(539, 179);
             this.buttonDetener.Name = "buttonDetener";
             this.buttonDetener.Size = new System.Drawing.Size(135, 57);
             this.buttonDetener.TabIndex = 3;
@@ -82,11 +84,31 @@
             // 
             this.timerSimulacion.Tick += new System.EventHandler(this.timerSimulacion_Tick);
             // 
+            // buttonVerDatos
+            // 
+            this.buttonVerDatos.Location = new System.Drawing.Point(539, 268);
+            this.buttonVerDatos.Name = "buttonVerDatos";
+            this.buttonVerDatos.Size = new System.Drawing.Size(135, 57);
+            this.buttonVerDatos.TabIndex = 4;
+            this.buttonVerDatos.Text = "Ver datos";
+            this.buttonVerDatos.UseVisualStyleBackColor = true;
+            // 
+            // Conflicte
+            // 
+            this.Conflicte.Location = new System.Drawing.Point(539, 355);
+            this.Conflicte.Name = "Conflicte";
+            this.Conflicte.Size = new System.Drawing.Size(135, 57);
+            this.Conflicte.TabIndex = 5;
+            this.Conflicte.Text = "Conflicto";
+            this.Conflicte.UseVisualStyleBackColor = true;
+            // 
             // Simulation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(742, 453);
+            this.Controls.Add(this.Conflicte);
+            this.Controls.Add(this.buttonVerDatos);
             this.Controls.Add(this.buttonDetener);
             this.Controls.Add(this.buttonIniciar);
             this.Controls.Add(this.buttonMover);
@@ -104,5 +126,7 @@
         private System.Windows.Forms.Button buttonIniciar;
         private System.Windows.Forms.Button buttonDetener;
         private System.Windows.Forms.Timer timerSimulacion;
+        private System.Windows.Forms.Button buttonVerDatos;
+        private System.Windows.Forms.Button Conflicte;
     }
 }

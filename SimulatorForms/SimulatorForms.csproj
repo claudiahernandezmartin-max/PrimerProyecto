@@ -47,11 +47,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DistanceForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DistanceForm.Designer.cs">
+      <DependentUpon>DistanceForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FlightPlansInterface.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FlightPlansInterface.Designer.cs">
       <DependentUpon>FlightPlansInterface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FlightDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FlightDataForm.Designer.cs">
+      <DependentUpon>FlightDataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Simulation.cs">
       <SubType>Form</SubType>
@@ -67,6 +79,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DistanceForm.resx">
+      <DependentUpon>DistanceForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FlightDataForm.resx">
+      <DependentUpon>FlightDataForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FlightPlansInterface.resx">
       <DependentUpon>FlightPlansInterface.cs</DependentUpon>
     </EmbeddedResource>
