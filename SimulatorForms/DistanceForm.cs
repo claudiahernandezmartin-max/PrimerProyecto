@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using FlightLib;
 
@@ -15,19 +8,24 @@ namespace SimulatorForms
     {
         FlightPlan seleccionado;
         FlightPlan otro;
-        public DistanceForm()
+
+        public DistanceForm(FlightPlan seleccionado, FlightPlan otro)
         {
             InitializeComponent();
 
-            double dist = seleccionado.GetCurrentPosition().Distancia(otro.GetCurrentPosition());
+            this.seleccionado = seleccionado;
+            this.otro = otro;
+
+            // Calculem la distància entre les posicions actuals
+            double dist = this.seleccionado.GetCurrentPosition().Distancia(this.otro.GetCurrentPosition());
 
             lblDistancia.Text = string.Format("Distancia entre {0} y {1}: {2:F2}",
-                seleccionado.GetId(), otro.GetId(), dist);
+                this.seleccionado.GetId(), this.otro.GetId(), dist);
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        public DistanceForm()
         {
-
+            InitializeComponent();
         }
     }
 }

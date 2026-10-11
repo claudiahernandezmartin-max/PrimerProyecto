@@ -1,87 +1,198 @@
 ﻿using System;
-using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using FlightLib;
 
 namespace SimulatorForms
 {
-    public partial class FlightDataForm : Form
+    public partial class Simulation : Form
     {
-        // Atributs per guardar els dos plans de vol
         FlightPlan plan1;
         FlightPlan plan2;
+        double distanciaSeguridad = 30;
 
-        // Constructor principal que rep els dos vols com a arguments
-        public FlightDataForm(FlightPlan plan1, FlightPlan plan2)
+        bool alarmaActivada = false;
+
+        public Simulation(FlightPlan plan1, FlightPlan plan2)
         {
             InitializeComponent();
 
             this.plan1 = plan1;
             this.plan2 = plan2;
-
-            CargarDatos();
         }
 
-        // Constructor secundari buit per evitar conflictes amb el dissenyador de Visual Studio
-        public FlightDataForm()
+        private void panelSimulacion_Paint(object sender, PaintEventArgs e)
         {
-            InitializeComponent();
+            Graphics g = e.Graphics;
+
+            g.DrawRectangle(Pens.Black, 0, 0,
+                panelSimulacion.Width - 1,
+                panelSimulacion.Height - 1);
+
+            float radio = (float)distanciaSeguridad;
+
+            // Dibujo avión 1
+            Position inicio1 = plan1.GetInitialPosition();
+            Position final1 = plan1.GetFinalPosition();
+            g.DrawLine(Pens.Blue, (float)inicio1.GetX(), (float)inicio1.GetY(), (float)final1.GetX(), (float)final1.GetY());
+
+            Position p1 = plan1.GetCurrentPosition();
+            float x1 = (float)p1.GetX();
+            float y1 = (float)p1.GetY();
+            g.DrawEllipse(Pens.Blue, x1 - radio, y1 - radio, radio * 2, radio * 2);
+            g.FillEllipse(Brushes.Blue, x1 - 5, y1 - 5, 10, 10);
+
+            // Dibujo avión 2
+            Position inicio2 = plan2.GetInitialPosition();
+            Position final2 = plan2.GetFinalPosition();
+            g.DrawLine(Pens.Red, (float)inicio2.GetX(), (float)inicio2.GetY(), (float)final2.GetX(), (float)final2.GetY());
+
+            Position p2 = plan2.GetCurrentPosition();
+            float x2 = (float)p2.GetX();
+            float y2 = (float)p2.GetY();
+            g.DrawEllipse(Pens.Red, x2 - radio, y2 - radio, radio * 2, radio * 2);
+            g.FillEllipse(Brushes.Red, x2 - 5, y2 - 5, 10, 10);
         }
 
-        private void CargarDatos()
+        private void button1_Click(object sender, EventArgs e)
         {
-            // Creem una taula per estructurar les dades dels vols
-            DataTable tabla = new DataTable();
-            tabla.Columns.Add("Identificador");
-            tabla.Columns.Add("Velocidad");
-            tabla.Columns.Add("Posición Actual");
-            tabla.Columns.Add("Ha llegado");
+            plan1.Move(1);
+            plan2.Move(1);
+            panelSimulacion.Invalidate();
+        }
 
-            if (plan1 != null)
+        private void panelSimulacion_MouseClick(object sender, MouseEventArgs e)
+        {
+            float x = e.X;
+            float y = e.Y;
+
+            Position p1 = plan1.GetCurrentPosition();
+            double distancia1 = Math.Sqrt((x - p1.GetX()) * (x - p1.GetX()) + (y - p1.GetY()) * (y - p1.GetY()));
+            if (distancia1 <= 10)
             {
-                tabla.Rows.Add(
-                    plan1.GetId(),
-                    plan1.GetVelocidad().ToString("F2"),
-                    string.Format("({0:F2}, {1:F2})", plan1.GetCurrentPosition().GetX(), plan1.GetCurrentPosition().GetY()),
-                    plan1.HasArrived() ? "Sí" : "No"
+                MessageBox.Show(
+                    "Identificador: " + plan1.GetId() +
+                    "\nVelocidad: " + plan1.GetVelocidad() +
+                    "\nPosición actual: (" +
+                    plan1.GetCurrentPosition().GetX() + ", " +
+                    plan1.GetCurrentPosition().GetY() + ")"
                 );
             }
 
-            if (plan2 != null)
+            Position p2 = plan2.GetCurrentPosition();
+            double distancia2 = Math.Sqrt((x - p2.GetX()) * (x - p2.GetX()) + (y - p2.GetY()) * (y - p2.GetY()));
+            if (distancia2 <= 10)
             {
-                tabla.Rows.Add(
-                    plan2.GetId(),
-                    plan2.GetVelocidad().ToString("F2"),
-                    string.Format("({0:F2}, {1:F2})", plan2.GetCurrentPosition().GetX(), plan2.GetCurrentPosition().GetY()),
-                    plan2.HasArrived() ? "Sí" : "No"
+                MessageBox.Show(
+                    "Identificador: " + plan2.GetId() +
+                    "\nVelocidad: " + plan2.GetVelocidad() +
+                    "\nPosición actual: (" +
+                    plan2.GetCurrentPosition().GetX() + ", " +
+                    plan2.GetCurrentPosition().GetY() + ")"
                 );
             }
-
-            // Enllacem la taula al DataGridView
-            dataGridViewVuelos.DataSource = tabla;
-            dataGridViewVuelos.ReadOnly = true;
-            dataGridViewVuelos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-            // Connectem l'esdeveniment de clic a la fila
-            dataGridViewVuelos.CellClick += DataGridViewVuelos_CellClick;
         }
 
-        private void DataGridViewVuelos_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void buttonIniciar_Click(object sender, EventArgs e)
         {
-            // Verifiquem que s'hagi clicat sobre una fila vàlida (no sobre la capçalera de columnes)
-            if (e.RowIndex >= 0)
+            timerSimulacion.Start();
+            buttonIniciar.Enabled = false;
+            buttonDetener.Enabled = true;
+            buttonMover.Enabled = false;
+        }
+
+        private void buttonDetener_Click(object sender, EventArgs e)
+        {
+            timerSimulacion.Stop();
+            buttonIniciar.Enabled = true;
+            buttonDetener.Enabled = false;
+            buttonMover.Enabled = true;
+        }
+
+        private void timerSimulacion_Tick(object sender, EventArgs e)
+        {
+            if (plan1.HasArrived() == false)
             {
-                if (e.RowIndex == 0)
+                plan1.Move(1);
+            }
+            if (plan2.HasArrived() == false)
+            {
+                plan2.Move(1);
+            }
+
+            panelSimulacion.Invalidate();
+
+            // FASE 10.1: Alarma de pérdida de separación
+            if (plan1.Conflicto(plan2, distanciaSeguridad))
+            {
+                if (!alarmaActivada)
                 {
-                    DistanceForm df = new DistanceForm(plan1, plan2);
-                    df.ShowDialog();
-                }
-                else if (e.RowIndex == 1)
-                {
-                    DistanceForm df = new DistanceForm(plan2, plan1);
-                    df.ShowDialog();
+                    alarmaActivada = true;
+                    MessageBox.Show("¡Alarma! Los vuelos están a una distancia inferior a la de seguridad.", "Pérdida de separación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+            else
+            {
+                alarmaActivada = false;
+            }
+
+            if (plan1.HasArrived() == true && plan2.HasArrived() == true)
+            {
+                timerSimulacion.Stop();
+                buttonIniciar.Enabled = true;
+                buttonDetener.Enabled = false;
+                buttonMover.Enabled = true;
+                MessageBox.Show("Los dos vuelos han llegado a su destino.");
+            }
+        }
+
+        // FASE 9.1: Abrir el formulario con el DataGridView
+        private void buttonVerDatos_Click(object sender, EventArgs e)
+        {
+            FlightDataForm f = new FlightDataForm(plan1, plan2);
+            f.ShowDialog();
+        }
+
+        // FASE 10.2: Comprobar si entrarán en conflicto
+        private void Conflicte_Click(object sender, EventArgs e)
+        {
+            Position posOriginal1 = plan1.GetCurrentPosition();
+            Position posOriginal2 = plan2.GetCurrentPosition();
+
+            FlightPlan testPlan1 = new FlightPlan(plan1.GetId(), posOriginal1.GetX(), posOriginal1.GetY(), plan1.GetFinalPosition().GetX(), plan1.GetFinalPosition().GetY(), plan1.GetVelocidad());
+            FlightPlan testPlan2 = new FlightPlan(plan2.GetId(), posOriginal2.GetX(), posOriginal2.GetY(), plan2.GetFinalPosition().GetX(), plan2.GetFinalPosition().GetY(), plan2.GetVelocidad());
+
+            bool conflicteFutur = false;
+
+            while (testPlan1.HasArrived() == false || testPlan2.HasArrived() == false)
+            {
+                if (testPlan1.HasArrived() == false)
+                    testPlan1.Move(1);
+
+                if (testPlan2.HasArrived() == false)
+                    testPlan2.Move(1);
+
+                if (testPlan1.Conflicto(testPlan2, distanciaSeguridad))
+                {
+                    conflicteFutur = true;
+                    break;
+                }
+            }
+
+            if (conflicteFutur)
+            {
+                MessageBox.Show("Los vuelos SÍ entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show("Los vuelos NO entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void buttonVerDatos_Click_1(object sender, EventArgs e)
+        {
+            FlightDataForm f = new FlightDataForm(plan1, plan2);
+            f.ShowDialog();
         }
     }
 }

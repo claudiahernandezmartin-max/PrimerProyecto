@@ -1,6 +1,11 @@
-﻿namespace SimulatorForms
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms; 
+using FlightLib;
+
+namespace SimulatorForms
 {
-    partial class FlightDataForm
+    partial class Simulation : Form
     {
         /// <summary>
         /// Required designer variable.
@@ -92,6 +97,7 @@
             this.buttonVerDatos.TabIndex = 4;
             this.buttonVerDatos.Text = "Ver datos";
             this.buttonVerDatos.UseVisualStyleBackColor = true;
+            this.buttonVerDatos.Click += new System.EventHandler(this.buttonVerDatos_Click_1);
             // 
             // Conflicte
             // 
@@ -101,6 +107,7 @@
             this.Conflicte.TabIndex = 5;
             this.Conflicte.Text = "Conflicto";
             this.Conflicte.UseVisualStyleBackColor = true;
+            this.Conflicte.Click += new System.EventHandler(this.Conflicte_Click);
             // 
             // Simulation
             // 

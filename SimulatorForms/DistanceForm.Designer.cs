@@ -40,7 +40,6 @@
             this.lblDistancia.Size = new System.Drawing.Size(111, 29);
             this.lblDistancia.TabIndex = 0;
             this.lblDistancia.Text = "Distancia";
-            this.lblDistancia.Click += new System.EventHandler(this.label1_Click);
             // 
             // DistanceForm
             // 
