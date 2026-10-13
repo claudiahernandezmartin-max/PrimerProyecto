@@ -31,6 +31,12 @@ namespace SimulatorForms
             FlightPlan plan1 = lista.GetFlightPlan(0);
             FlightPlan plan2 = lista.GetFlightPlan(1);
 
+            if (plan1 == null || plan2 == null)
+            {
+                MessageBox.Show("One or both flight plans are missing.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             Simulation f = new Simulation(plan1, plan2);
             f.ShowDialog();
         }

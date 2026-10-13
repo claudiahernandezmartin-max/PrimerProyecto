@@ -95,6 +95,31 @@ namespace SimulatorForms
 
         private void buttonIniciar_Click(object sender, EventArgs e)
         {
+            // FASE 11: abans de començar, mirem si hi haura conflicte
+            if (HabraConflicto() == true)
+            {
+                DialogResult respuesta = MessageBox.Show(
+                    "Los vuelos entrarán en conflicto.\n¿Quieres resolverlo cambiando automáticamente la velocidad de uno de los vuelos?",
+                    "Conflicto detectado", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (respuesta == DialogResult.Yes)
+                {
+                    // Primero se intenta frenando el vuelo 1; si no funciona, frenando el vuelo 2
+                    if (ResolverConflicto(plan1) == true)
+                    {
+                        MessageBox.Show("Conflicto resuelto. Nueva velocidad de " + plan1.GetId() + ": " + plan1.GetVelocidad().ToString("F2"));
+                    }
+                    else if (ResolverConflicto(plan2) == true)
+                    {
+                        MessageBox.Show("Conflicto resuelto. Nueva velocidad de " + plan2.GetId() + ": " + plan2.GetVelocidad().ToString("F2"));
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se ha podido resolver el conflicto cambiando la velocidad. La simulación continuará con las velocidades originales.");
+                    }
+                }
+                // Si responde que no, no se hace nada y la simulación continúa de forma habitual
+            }
             timerSimulacion.Start();
             buttonIniciar.Enabled = false;
             buttonDetener.Enabled = true;
@@ -156,6 +181,18 @@ namespace SimulatorForms
         // FASE 10.2: Comprobar si entrarán en conflicto
         private void Conflicte_Click(object sender, EventArgs e)
         {
+            if (HabraConflicto() == true)
+            {
+                MessageBox.Show("Los vuelos SÍ entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show("Los vuelos NO entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private bool HabraConflicto()
+        {
             Position posOriginal1 = plan1.GetCurrentPosition();
             Position posOriginal2 = plan2.GetCurrentPosition();
 
@@ -164,7 +201,7 @@ namespace SimulatorForms
 
             bool conflicteFutur = false;
 
-            while (testPlan1.HasArrived() == false || testPlan2.HasArrived() == false)
+            while ((testPlan1.HasArrived() == false || testPlan2.HasArrived() == false) && conflicteFutur == false)
             {
                 if (testPlan1.HasArrived() == false)
                     testPlan1.Move(1);
@@ -175,18 +212,41 @@ namespace SimulatorForms
                 if (testPlan1.Conflicto(testPlan2, distanciaSeguridad))
                 {
                     conflicteFutur = true;
-                    break;
                 }
             }
 
-            if (conflicteFutur)
+            return conflicteFutur;
+        }
+
+        // FASE 11: Baixa mica en mica la velocitat del vol fins que ja no hi hagi conflicte, tornant true si no hi ha conflicte.
+        // Si no es pot resoldre el conflicte, torna false i deixa la velocitat original.
+        private bool ResolverConflicto(FlightPlan plan)
+        {
+            double velocidadOriginal = plan.GetVelocidad();
+            int porcentaje = 99;
+            bool resuelto = false;
+
+            // El límit del 10% evita que sigui infinit
+            while (resuelto == false && porcentaje >= 10)
             {
-                MessageBox.Show("Los vuelos SÍ entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                plan.SetVelocidad(velocidadOriginal * porcentaje / 100.0);
+
+                if (HabraConflicto() == false)
+                {
+                    resuelto = true;
+                }
+                else
+                {
+                    porcentaje = porcentaje - 1;
+                }
             }
-            else
+
+            if (resuelto == false)
             {
-                MessageBox.Show("Los vuelos NO entrarán en conflicto.", "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                plan.SetVelocidad(velocidadOriginal);
             }
+
+            return resuelto;
         }
 
         private void buttonVerDatos_Click_1(object sender, EventArgs e)
