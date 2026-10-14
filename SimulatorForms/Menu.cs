@@ -14,6 +14,11 @@ namespace SimulatorForms
     public partial class Menu : Form
     {
         FlightPlanList lista = new FlightPlanList();
+
+        // FASE 2.3: valores por defecto si el usuario no los cambia
+        double distanciaSeguridad = 30;
+        double tiempoCiclo = 1;
+
         public Menu()
         {
             InitializeComponent();
@@ -37,8 +42,20 @@ namespace SimulatorForms
                 return;
             }
 
-            Simulation f = new Simulation(plan1, plan2);
+            Simulation f = new Simulation(plan1, plan2, distanciaSeguridad, tiempoCiclo);
             f.ShowDialog();
+        }
+
+        private void distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ParametrosForm f = new ParametrosForm();
+            f.ShowDialog();
+
+            if (f.GetAceptado() == true)
+            {
+                distanciaSeguridad = f.GetDistancia();
+                tiempoCiclo = f.GetCiclo();
+            }
         }
     }
 }

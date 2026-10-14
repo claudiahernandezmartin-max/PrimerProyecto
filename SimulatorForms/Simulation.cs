@@ -9,16 +9,19 @@ namespace SimulatorForms
     {
         FlightPlan plan1;
         FlightPlan plan2;
-        double distanciaSeguridad = 30;
+        double distanciaSeguridad;
+        double tiempoCiclo;
 
         bool alarmaActivada = false;
 
-        public Simulation(FlightPlan plan1, FlightPlan plan2)
+        public Simulation(FlightPlan plan1, FlightPlan plan2, double distanciaSeguridad, double tiempoCiclo)
         {
             InitializeComponent();
-
+            
             this.plan1 = plan1;
             this.plan2 = plan2;
+            this.distanciaSeguridad = distanciaSeguridad;
+            this.tiempoCiclo = tiempoCiclo;
         }
 
         private void panelSimulacion_Paint(object sender, PaintEventArgs e)
@@ -56,8 +59,8 @@ namespace SimulatorForms
 
         private void button1_Click(object sender, EventArgs e)
         {
-            plan1.Move(1);
-            plan2.Move(1);
+            plan1.Move(tiempoCiclo);
+            plan2.Move(tiempoCiclo);
             panelSimulacion.Invalidate();
         }
 
@@ -138,11 +141,11 @@ namespace SimulatorForms
         {
             if (plan1.HasArrived() == false)
             {
-                plan1.Move(1);
+                plan1.Move(tiempoCiclo);
             }
             if (plan2.HasArrived() == false)
             {
-                plan2.Move(1);
+                plan2.Move(tiempoCiclo);
             }
 
             panelSimulacion.Invalidate();
@@ -203,16 +206,13 @@ namespace SimulatorForms
 
             while ((testPlan1.HasArrived() == false || testPlan2.HasArrived() == false) && conflicteFutur == false)
             {
+                // Se avanza en pasos de una décima de ciclo para no saltarse
+                // un cruce que ocurra entre dos ciclos (si los aviones van rápido)
                 if (testPlan1.HasArrived() == false)
-                    testPlan1.Move(1);
+                    testPlan1.Move(tiempoCiclo / 10);
 
                 if (testPlan2.HasArrived() == false)
-                    testPlan2.Move(1);
-
-                if (testPlan1.Conflicto(testPlan2, distanciaSeguridad))
-                {
-                    conflicteFutur = true;
-                }
+                    testPlan2.Move(tiempoCiclo / 10);
             }
 
             return conflicteFutur;

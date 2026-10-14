@@ -61,6 +61,7 @@
             this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Name = "distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem";
             this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Size = new System.Drawing.Size(294, 24);
             this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Text = "Distancia de seguridad y tiempo de ciclo";
+            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Click += new System.EventHandler(this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click);
             // 
             // simulacionToolStripMenuItem
             // 
@@ -76,7 +77,7 @@
             this.ClientSize = new System.Drawing.Size(1103, 508);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Menu";
             this.Text = "Form1";
             this.menuStrip1.ResumeLayout(false);

@@ -22,10 +22,5 @@ namespace SimulatorForms
             lblDistancia.Text = string.Format("Distancia entre {0} y {1}: {2:F2}",
                 this.seleccionado.GetId(), this.otro.GetId(), dist);
         }
-
-        public DistanceForm()
-        {
-            InitializeComponent();
-        }
     }
 }
