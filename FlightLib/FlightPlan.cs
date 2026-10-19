@@ -16,6 +16,7 @@ namespace FlightLib
         Position finalPosition; // posicion final
         Position initialPosition; // posicion inicial
         double velocidad;
+        double velocidadInicial; // para el Reset
 
         // Constructures
         public FlightPlan(string id, double cpx, double cpy, double fpx, double fpy, double velocidad)
@@ -25,6 +26,7 @@ namespace FlightLib
             this.finalPosition = new Position(fpx, fpy);
             this.initialPosition = new Position(cpx, cpy);
             this.velocidad = velocidad;
+            this.velocidadInicial = velocidad;
         }
 
         // Gets i Sets
@@ -131,6 +133,7 @@ namespace FlightLib
         public void Restart()
         {
             currentPosition = initialPosition;
+            this.velocidad = this.velocidadInicial;
         }
 
         //Fer métode que detecti quan hi ha dos vols que estan més aprop de la distància de seguretat 

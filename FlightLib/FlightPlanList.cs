@@ -32,6 +32,11 @@ namespace FlightLib
 
             return vector[i];
         }
+        // Borra los vuelos guardados para poder meter los nuevos
+        public void Vaciar()
+        {
+            number = 0;
+        }
         public void Mover(double tiempo)
         {
             int i = 0;

@@ -14,6 +14,13 @@ namespace SimulatorForms
             InitializeComponent();
         }
 
+        // Pone en las cajas los valores que hay ahora
+        public void SetDatos(double distancia, double ciclo)
+        {
+            TextBoxDistancia.Text = distancia.ToString();
+            TextBoxCiclo.Text = ciclo.ToString();
+        }
+
         public double GetDistancia()
         {
             return distancia;
@@ -52,6 +59,12 @@ namespace SimulatorForms
             {
                 MessageBox.Show("Hay algún dato mal escrito. Revisa que los números sean correctos.");
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            TextBoxDistancia.Text = "15";
+            TextBoxCiclo.Text = "2";
         }
     }
 }

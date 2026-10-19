@@ -16,8 +16,8 @@ namespace SimulatorForms
         FlightPlanList lista = new FlightPlanList();
 
         // FASE 2.3: valores por defecto si el usuario no los cambia
-        double distanciaSeguridad = 30;
-        double tiempoCiclo = 1;
+        double distanciaSeguridad = 15;
+        double tiempoCiclo = 2;
 
         public Menu()
         {
@@ -29,6 +29,7 @@ namespace SimulatorForms
             FlightPlansInterface f = new FlightPlansInterface();
             f.SetLista(lista);
             f.ShowDialog();
+
         }
 
         private void simulacionToolStripMenuItem_Click(object sender, EventArgs e)

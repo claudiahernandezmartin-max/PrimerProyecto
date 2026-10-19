@@ -22,6 +22,7 @@ namespace SimulatorForms
             this.plan2 = plan2;
             this.distanciaSeguridad = distanciaSeguridad;
             this.tiempoCiclo = tiempoCiclo;
+            ActualizarEstado();
         }
 
         private void panelSimulacion_Paint(object sender, PaintEventArgs e)
@@ -59,9 +60,32 @@ namespace SimulatorForms
 
         private void button1_Click(object sender, EventArgs e)
         {
-            plan1.Move(tiempoCiclo);
-            plan2.Move(tiempoCiclo);
+            if (plan1.HasArrived() == false) plan1.Move(tiempoCiclo);
+            if (plan2.HasArrived() == false) plan2.Move(tiempoCiclo);
             panelSimulacion.Invalidate();
+
+            // Después de mover, decimos si hay o habrá conflicto
+            ActualizarEstado();
+        }
+
+        // Escribe en el label si hay conflicto ahora, si lo habrá o si no
+        private void ActualizarEstado()
+        {
+            if (plan1.Conflicto(plan2, distanciaSeguridad))
+            {
+                labelEstado.Text = "¡CONFLICTO! Están a menos de la distancia de seguridad";
+                labelEstado.ForeColor = Color.Red;
+            }
+            else if (HabraConflicto())
+            {
+                labelEstado.Text = "Aviso: si siguen así, HABRÁ conflicto";
+                labelEstado.ForeColor = Color.DarkOrange;
+            }
+            else
+            {
+                labelEstado.Text = "No habrá conflicto";
+                labelEstado.ForeColor = Color.Green;
+            }
         }
 
         private void panelSimulacion_MouseClick(object sender, MouseEventArgs e)
@@ -98,7 +122,7 @@ namespace SimulatorForms
 
         private void buttonIniciar_Click(object sender, EventArgs e)
         {
-            // FASE 11: abans de començar, mirem si hi haura conflicte
+            
             if (HabraConflicto() == true)
             {
                 DialogResult respuesta = MessageBox.Show(
@@ -150,7 +174,7 @@ namespace SimulatorForms
 
             panelSimulacion.Invalidate();
 
-            // FASE 10.1: Alarma de pérdida de separación
+            // FASE 10: Alarma de pérdida de separación
             if (plan1.Conflicto(plan2, distanciaSeguridad))
             {
                 if (!alarmaActivada)
@@ -174,7 +198,7 @@ namespace SimulatorForms
             }
         }
 
-        // FASE 9.1: Abrir el formulario con el DataGridView
+        // FASE 9: Abrir el formulario con el DataGridView
         private void buttonVerDatos_Click(object sender, EventArgs e)
         {
             FlightDataForm f = new FlightDataForm(plan1, plan2);
@@ -208,25 +232,23 @@ namespace SimulatorForms
             {
                 // Se avanza en pasos de una décima de ciclo para no saltarse
                 // un cruce que ocurra entre dos ciclos (si los aviones van rápido)
-                if (testPlan1.HasArrived() == false)
-                    testPlan1.Move(tiempoCiclo / 10);
+                if (testPlan1.HasArrived() == false)testPlan1.Move(tiempoCiclo / 10);
 
-                if (testPlan2.HasArrived() == false)
-                    testPlan2.Move(tiempoCiclo / 10);
+                if (testPlan2.HasArrived() == false)testPlan2.Move(tiempoCiclo / 10);
+
+                if (testPlan1.Conflicto(testPlan2, distanciaSeguridad)) conflicteFutur = true;
             }
-
             return conflicteFutur;
         }
 
-        // FASE 11: Baixa mica en mica la velocitat del vol fins que ja no hi hagi conflicte, tornant true si no hi ha conflicte.
-        // Si no es pot resoldre el conflicte, torna false i deixa la velocitat original.
+        
         private bool ResolverConflicto(FlightPlan plan)
         {
             double velocidadOriginal = plan.GetVelocidad();
             int porcentaje = 99;
             bool resuelto = false;
 
-            // El límit del 10% evita que sigui infinit
+            // El límite del 10% evita que sea infinito
             while (resuelto == false && porcentaje >= 10)
             {
                 plan.SetVelocidad(velocidadOriginal * porcentaje / 100.0);
@@ -253,6 +275,21 @@ namespace SimulatorForms
         {
             FlightDataForm f = new FlightDataForm(plan1, plan2);
             f.ShowDialog();
+        }
+
+        private void Restart_Click(object sender, EventArgs e)
+        {
+            timerSimulacion.Stop();
+            plan1.Restart();
+            plan2.Restart();
+            alarmaActivada = false;
+
+            buttonIniciar.Enabled = true;
+            buttonDetener.Enabled = false;
+            buttonMover.Enabled = true;
+
+            panelSimulacion.Invalidate();
+            ActualizarEstado();
         }
     }
 }
