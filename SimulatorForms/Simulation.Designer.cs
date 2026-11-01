@@ -43,6 +43,12 @@ namespace SimulatorForms
             this.Conflicte = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.labelEstado = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.dataGridViewVelocidades = new System.Windows.Forms.DataGridView();
+            this.columnaVuelo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.columnaVelocidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.buttonVelocidadesOriginales = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVelocidades)).BeginInit();
             this.SuspendLayout();
             // 
             // panelSimulacion
@@ -130,11 +136,63 @@ namespace SimulatorForms
             this.labelEstado.TabIndex = 7;
             this.labelEstado.Text = "Estado";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(795, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(137, 16);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Vuelos y velocidades";
+            // 
+            // dataGridViewVelocidades
+            // 
+            this.dataGridViewVelocidades.AllowUserToAddRows = false;
+            this.dataGridViewVelocidades.AllowUserToDeleteRows = false;
+            this.dataGridViewVelocidades.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewVelocidades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewVelocidades.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.columnaVuelo,
+            this.columnaVelocidad});
+            this.dataGridViewVelocidades.Location = new System.Drawing.Point(798, 50);
+            this.dataGridViewVelocidades.Name = "dataGridViewVelocidades";
+            this.dataGridViewVelocidades.RowHeadersVisible = false;
+            this.dataGridViewVelocidades.RowHeadersWidth = 51;
+            this.dataGridViewVelocidades.RowTemplate.Height = 24;
+            this.dataGridViewVelocidades.Size = new System.Drawing.Size(240, 150);
+            this.dataGridViewVelocidades.TabIndex = 9;
+            this.dataGridViewVelocidades.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewVelocidades_CellEndEdit);
+            // 
+            // columnaVuelo
+            // 
+            this.columnaVuelo.HeaderText = "Vuelo";
+            this.columnaVuelo.MinimumWidth = 6;
+            this.columnaVuelo.Name = "columnaVuelo";
+            // 
+            // columnaVelocidad
+            // 
+            this.columnaVelocidad.HeaderText = "Velocidad";
+            this.columnaVelocidad.MinimumWidth = 6;
+            this.columnaVelocidad.Name = "columnaVelocidad";
+            // 
+            // buttonVelocidadesOriginales
+            // 
+            this.buttonVelocidadesOriginales.Location = new System.Drawing.Point(855, 226);
+            this.buttonVelocidadesOriginales.Name = "buttonVelocidadesOriginales";
+            this.buttonVelocidadesOriginales.Size = new System.Drawing.Size(143, 64);
+            this.buttonVelocidadesOriginales.TabIndex = 10;
+            this.buttonVelocidadesOriginales.Text = "Originales";
+            this.buttonVelocidadesOriginales.UseVisualStyleBackColor = true;
+            this.buttonVelocidadesOriginales.Click += new System.EventHandler(this.buttonVelocidadesOriginales_Click);
+            // 
             // Simulation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(801, 530);
+            this.ClientSize = new System.Drawing.Size(1112, 523);
+            this.Controls.Add(this.buttonVelocidadesOriginales);
+            this.Controls.Add(this.dataGridViewVelocidades);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.labelEstado);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.Conflicte);
@@ -145,6 +203,7 @@ namespace SimulatorForms
             this.Controls.Add(this.panelSimulacion);
             this.Name = "Simulation";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVelocidades)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,5 +220,10 @@ namespace SimulatorForms
         private System.Windows.Forms.Button Conflicte;
         private Button button1;
         private Label labelEstado;
+        private Label label1;
+        private DataGridView dataGridViewVelocidades;
+        private DataGridViewTextBoxColumn columnaVuelo;
+        private DataGridViewTextBoxColumn columnaVelocidad;
+        private Button buttonVelocidadesOriginales;
     }
 }

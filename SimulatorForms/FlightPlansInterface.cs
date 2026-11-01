@@ -17,6 +17,25 @@ namespace SimulatorForms
         public void SetLista(FlightPlanList lista)
         {
             this.lista = lista;
+
+            // Si ya había vuelos guardados, los ponemos en las cajas para no tener que escribirlos otra vez
+            if (lista.GetFlightPlan(0) != null)
+            {
+                PonerDatos(lista.GetFlightPlan(0), FP1_id, FP1_vel, FP1_xi, FP1_yi, FP1_xf, FP1_yf);
+            }
+            if (lista.GetFlightPlan(1) != null)
+            {
+                PonerDatos(lista.GetFlightPlan(1), FP2_id, FP2_vel, FP2_xi, FP2_yi, FP2_xf, FP2_yf);
+            }
+        }
+        private void PonerDatos(FlightPlan p, TextBox id, TextBox vel, TextBox xi, TextBox yi, TextBox xf, TextBox yf)
+        {
+            id.Text = p.GetId();
+            vel.Text = p.GetVelocidadInicial().ToString();
+            xi.Text = p.GetInitialPosition().GetX().ToString();
+            yi.Text = p.GetInitialPosition().GetY().ToString();
+            xf.Text = p.GetFinalPosition().GetX().ToString();
+            yf.Text = p.GetFinalPosition().GetY().ToString();
         }
 
         public FlightPlansInterface()
@@ -29,29 +48,41 @@ namespace SimulatorForms
             try
             {
                 // Avión 1: leer los datos
-                string id1 = FP1_id.Text;
+                string id1 = FP1_id.Text.Trim();
                 double vel1 = Convert.ToDouble(FP1_vel.Text);
                 double xi1 = Convert.ToDouble(FP1_xi.Text);
                 double yi1 = Convert.ToDouble(FP1_yi.Text);
                 double xf1 = Convert.ToDouble(FP1_xf.Text);
                 double yf1 = Convert.ToDouble(FP1_yf.Text);
-                FlightPlan plan1 = new FlightPlan(id1, xi1, yi1, xf1, yf1, vel1);
 
                 // Avión 2: leer los datos
-                string id2 = FP2_id.Text;
+                string id2 = FP2_id.Text.Trim();
                 double vel2 = Convert.ToDouble(FP2_vel.Text);
                 double xi2 = Convert.ToDouble(FP2_xi.Text);
                 double yi2 = Convert.ToDouble(FP2_yi.Text);
                 double xf2 = Convert.ToDouble(FP2_xf.Text);
                 double yf2 = Convert.ToDouble(FP2_yf.Text);
-                FlightPlan plan2 = new FlightPlan(id2, xi2, yi2, xf2, yf2, vel2);
-                
-                // Las velocidades tienen que ser positivas
+
+                // Comprobaciones ANTES de crear los vuelos
                 if (vel1 <= 0 || vel2 <= 0)
                 {
                     MessageBox.Show("La velocidad tiene que ser mayor que 0.");
                     return;
                 }
+                if (id1 == "" || id2 == "")
+                {
+                    MessageBox.Show("Los dos vuelos necesitan un identificador.");
+                    return;
+                }
+                if (id1 == id2)
+                {
+                    MessageBox.Show("Los dos vuelos no pueden tener el mismo identificador.");
+                    return;
+                }
+
+                // Ahora sí, creamos los vuelos
+                FlightPlan plan1 = new FlightPlan(id1, xi1, yi1, xf1, yf1, vel1);
+                FlightPlan plan2 = new FlightPlan(id2, xi2, yi2, xf2, yf2, vel2);
 
                 // Quitamos los vuelos anteriores para que no se acumulen
                 lista.Vaciar();
@@ -64,6 +95,10 @@ namespace SimulatorForms
             catch (FormatException)
             {
                 MessageBox.Show("Hay algún dato mal escrito. Revisa que los números sean correctos.");
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

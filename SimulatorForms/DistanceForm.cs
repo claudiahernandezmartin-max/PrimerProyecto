@@ -6,21 +6,27 @@ namespace SimulatorForms
 {
     public partial class DistanceForm : Form
     {
-        FlightPlan seleccionado;
-        FlightPlan otro;
-
-        public DistanceForm(FlightPlan seleccionado, FlightPlan otro)
+        public DistanceForm(FlightPlanList lista, int seleccionado)
         {
             InitializeComponent();
 
-            this.seleccionado = seleccionado;
-            this.otro = otro;
+            FlightPlan plan = lista.GetFlightPlan(seleccionado);
 
-            // Calculem la distància entre les posicions actuals
-            double dist = this.seleccionado.GetCurrentPosition().Distancia(this.otro.GetCurrentPosition());
+            // Distancia del vuelo elegido a cada uno de los demás
+            string texto = "Distancias desde " + plan.GetId() + ":\n\n";
+            int i = 0;
+            while (i < lista.GetNumber())
+            {
+                if (i != seleccionado)
+                {
+                    FlightPlan otro = lista.GetFlightPlan(i);
+                    double dist = plan.GetCurrentPosition().Distancia(otro.GetCurrentPosition());
+                    texto = texto + string.Format("  a {0}: {1:F2}\n", otro.GetId(), dist);
+                }
+                i++;
+            }
 
-            lblDistancia.Text = string.Format("Distancia entre {0} y {1}: {2:F2}",
-                this.seleccionado.GetId(), this.otro.GetId(), dist);
+            lblDistancia.Text = texto;
         }
     }
 }
