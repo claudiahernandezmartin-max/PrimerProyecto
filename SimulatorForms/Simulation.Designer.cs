@@ -48,6 +48,7 @@ namespace SimulatorForms
             this.columnaVuelo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnaVelocidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.buttonVelocidadesOriginales = new System.Windows.Forms.Button();
+            this.labelDistancia = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVelocidades)).BeginInit();
             this.SuspendLayout();
             // 
@@ -185,11 +186,22 @@ namespace SimulatorForms
             this.buttonVelocidadesOriginales.UseVisualStyleBackColor = true;
             this.buttonVelocidadesOriginales.Click += new System.EventHandler(this.buttonVelocidadesOriginales_Click);
             // 
+            // labelDistancia
+            // 
+            this.labelDistancia.AutoSize = true;
+            this.labelDistancia.Location = new System.Drawing.Point(66, 428);
+            this.labelDistancia.Name = "labelDistancia";
+            this.labelDistancia.Size = new System.Drawing.Size(128, 16);
+            this.labelDistancia.TabIndex = 11;
+            this.labelDistancia.Text = "Pareja más cercana";
+            this.labelDistancia.Click += new System.EventHandler(this.label2_Click);
+            // 
             // Simulation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1112, 523);
+            this.Controls.Add(this.labelDistancia);
             this.Controls.Add(this.buttonVelocidadesOriginales);
             this.Controls.Add(this.dataGridViewVelocidades);
             this.Controls.Add(this.label1);
@@ -203,6 +215,7 @@ namespace SimulatorForms
             this.Controls.Add(this.panelSimulacion);
             this.Name = "Simulation";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Simulation_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVelocidades)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -225,5 +238,6 @@ namespace SimulatorForms
         private DataGridViewTextBoxColumn columnaVuelo;
         private DataGridViewTextBoxColumn columnaVelocidad;
         private Button buttonVelocidadesOriginales;
+        private Label labelDistancia;
     }
 }

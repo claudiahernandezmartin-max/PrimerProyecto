@@ -156,6 +156,29 @@ namespace FlightLib
             vector[f].SetVelocidad(v0);
             return false;
         }
+
+        // Distancia actual entre la pareja de vuelos más cercana
+        public double DistanciaMinimaActual(out int a, out int b)
+        {
+            a = -1;
+            b = -1;
+            double minima = double.MaxValue;
+
+            for (int i = 0; i < number; i++)
+            {
+                for (int j = i + 1; j < number; j++)
+                {
+                    double d = vector[i].GetCurrentPosition().Distancia(vector[j].GetCurrentPosition());
+                    if (d < minima)
+                    {
+                        minima = d;
+                        a = i;
+                        b = j;
+                    }
+                }
+            }
+            return minima;
+        }
         public void EscribeConsola()
         {
             int i = 0;

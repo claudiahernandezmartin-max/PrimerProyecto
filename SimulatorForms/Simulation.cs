@@ -26,6 +26,10 @@ namespace SimulatorForms
             ActualizarEstado();
         }
 
+        private void Simulation_Load(object sender, EventArgs e)
+        {
+        }
+
         private void panelSimulacion_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
@@ -44,11 +48,7 @@ namespace SimulatorForms
                 FlightPlan plan = lista.GetFlightPlan(i);
 
                 // Colores alternos de la clase Estilo
-                Color color = Estilo.ColorAvion1;
-                if (i % 2 == 1)
-                {
-                    color = Estilo.ColorAvion2;
-                }
+                Color color = Estilo.ColoresAvion[i % Estilo.ColoresAvion.Length];
 
                 // Trayectoria (línea a rayas)
                 Position inicio = plan.GetInitialPosition();
@@ -102,6 +102,16 @@ namespace SimulatorForms
         {
             int a, b;
             double dMin, t;
+
+
+            // Distancia entre la pareja de vuelos más cercana ahora mismo
+            int p, q;
+            double dActual = lista.DistanciaMinimaActual(out p, out q);
+            if (p >= 0)
+            {
+                labelDistancia.Text = string.Format("Pareja más cercana: {0} y {1} (distancia {2:F2})",
+                    lista.GetFlightPlan(p).GetId(), lista.GetFlightPlan(q).GetId(), dActual);
+            }
 
             if (lista.HayConflicto(distanciaSeguridad))
             {
@@ -217,8 +227,8 @@ namespace SimulatorForms
 
             if (MessageBox.Show(texto, "Propuesta", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                CargarTablaVelocidades();   
-                ActualizarEstado();
+                CargarTablaVelocidades();
+                Restart_Click(null, null);
             }
             else
             {
@@ -331,6 +341,7 @@ namespace SimulatorForms
 
             FlightPlan plan = lista.GetFlightPlan(e.RowIndex);
             object valor = dataGridViewVelocidades.Rows[e.RowIndex].Cells[1].Value;
+            bool valida = true;
 
             try
             {
@@ -338,19 +349,29 @@ namespace SimulatorForms
             }
             catch (FormatException)
             {
+                valida = false;
                 MessageBox.Show("La velocidad tiene que ser un número.");
             }
             catch (ArgumentException)
             {
+                valida = false;
                 MessageBox.Show("La velocidad tiene que ser mayor que 0.");
             }
 
-            // Esperamos a que la tabla acabe de editar, la recargamos y reiniciamos
+            // Esperamos a que la tabla acabe de editar, la recargamos y, solo si era válida, reiniciamos
             BeginInvoke(new Action(delegate ()
             {
                 CargarTablaVelocidades();
-                Restart_Click(null, null);
+                if (valida)
+                {
+                    Restart_Click(null, null);
+                }
             }));
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

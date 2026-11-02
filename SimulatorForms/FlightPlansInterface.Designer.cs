@@ -56,6 +56,7 @@
             this.label12 = new System.Windows.Forms.Label();
             this.AcceptButtonFlightplans = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.buttonOchoVuelos = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // FlightPlan1Label
@@ -303,11 +304,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // buttonOchoVuelos
+            // 
+            this.buttonOchoVuelos.Location = new System.Drawing.Point(316, 581);
+            this.buttonOchoVuelos.Name = "buttonOchoVuelos";
+            this.buttonOchoVuelos.Size = new System.Drawing.Size(112, 56);
+            this.buttonOchoVuelos.TabIndex = 29;
+            this.buttonOchoVuelos.Text = "8 vuelos";
+            this.buttonOchoVuelos.UseVisualStyleBackColor = true;
+            this.buttonOchoVuelos.Click += new System.EventHandler(this.button2_Click);
+            // 
             // FlightPlansInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1369, 791);
+            this.Controls.Add(this.buttonOchoVuelos);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.AcceptButtonFlightplans);
             this.Controls.Add(this.label12);
@@ -374,5 +386,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button AcceptButtonFlightplans;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonOchoVuelos;
     }
 }

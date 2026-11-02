@@ -120,5 +120,19 @@ namespace SimulatorForms
             FP2_xf.Text = "250";
             FP2_yf.Text = "0";
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            lista.Vaciar();
+            lista.AddFlightPlan(new FlightPlan("AV1", 0, 0, 250, 250, 100));
+            lista.AddFlightPlan(new FlightPlan("AV2", 0, 250, 250, 0, 100));
+            lista.AddFlightPlan(new FlightPlan("AV3", 0, 125, 250, 125, 90));
+            lista.AddFlightPlan(new FlightPlan("AV4", 125, 0, 125, 250, 90));
+            lista.AddFlightPlan(new FlightPlan("AV5", 0, 60, 250, 190, 95));
+            lista.AddFlightPlan(new FlightPlan("AV6", 250, 60, 0, 190, 95));
+            lista.AddFlightPlan(new FlightPlan("AV7", 60, 0, 190, 250, 85));
+            lista.AddFlightPlan(new FlightPlan("AV8", 190, 0, 60, 250, 85));
+            Close();
+        }
     }
 }

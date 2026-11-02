@@ -25,6 +25,22 @@ namespace SimulatorForms
         public static Color ColorAvion1 = Color.FromArgb(255, 112, 67);       // avión 1: naranja
         public static Color ColorAvion2 = Color.FromArgb(38, 103, 115);       // avión 2: verde azulado
 
+         
+        /// colores para los 8 aviones
+        
+   
+        public static Color[] ColoresAvion =
+{
+            Color.FromArgb(255, 112, 67),
+            Color.FromArgb(38, 103, 115),
+            Color.FromArgb(142, 68, 173),
+            Color.FromArgb(39, 174, 96),
+            Color.FromArgb(41, 128, 185),
+            Color.FromArgb(233, 30, 99),
+            Color.FromArgb(121, 85, 72),
+            Color.FromArgb(127, 140, 141)
+        };
+
         // ---------------- LETRAS ----------------
         public static Font FuenteNormal = new Font("Segoe UI", 10);
         public static Font FuenteCampo = new Font("Segoe UI", 11);
