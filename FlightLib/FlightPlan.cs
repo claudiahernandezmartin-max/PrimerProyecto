@@ -208,88 +208,49 @@ namespace FlightLib
             }
             return resultado;
         }
-        public double DistanciaMinima(FlightPlan b, out double tiempoMinimo)
+        // Instante (en minutos) en el que los dos aviones están más cerca
+        public double TiempoMinimo(FlightPlan b)
         {
-            double llegadaA = this.TiempoHastaLlegada();
-            double llegadaB = b.TiempoHastaLlegada();
-            double[] inicioTramo = { 0, Math.Min(llegadaA, llegadaB) };
-            double[] finTramo = { Math.Min(llegadaA, llegadaB), Math.Max(llegadaA, llegadaB) };
+            // Posición y velocidad de b respecto a este avión
+            double px = b.currentPosition.GetX() - currentPosition.GetX();
+            double py = b.currentPosition.GetY() - currentPosition.GetY();
+            double vx = b.GetVelocidadX() - GetVelocidadX();
+            double vy = b.GetVelocidadY() - GetVelocidadY();
 
-            // De momento, la mínima es la distancia de ahora
-            double dMin = this.currentPosition.Distancia(b.currentPosition);
-            tiempoMinimo = 0;
-
-            int i = 0;
-            while (i < 2)
+            // d²(t) = (px + vx·t)² + (py + vy·t)²
+            // Derivada: d²'(t) = 2·(px + vx·t)·vx + 2·(py + vy·t)·vy
+            // Igualamos a 0 (mínimo) y despejamos: t = -(px·vx + py·vy) / (vx² + vy²)
+            double t = 0;
+            double v2 = vx * vx + vy * vy;
+            if (v2 > 0)
             {
-                double ta = inicioTramo[i];
-                double tb = finTramo[i];
-
-                if (tb > ta)
-                {
-                    // Dónde están los dos al empezar el tramo
-                    Position pa = this.PosicionEnTiempo(ta);
-                    Position pb = b.PosicionEnTiempo(ta);
-
-                    // Velocidades durante el tramo (si ya ha llegado, se queda parado)
-                    double vax = 0, vay = 0, vbx = 0, vby = 0;
-                    if (ta < llegadaA)
-                    {
-                        vax = this.GetVelocidadX();
-                        vay = this.GetVelocidadY();
-                    }
-                    if (ta < llegadaB)
-                    {
-                        vbx = b.GetVelocidadX();
-                        vby = b.GetVelocidadY();
-                    }
-
-                    // Posición y velocidad relativas (B respecto a A)
-                    double px = pb.GetX() - pa.GetX();
-                    double py = pb.GetY() - pa.GetY();
-                    double vx = vbx - vax;
-                    double vy = vby - vay;
-
-                    // Derivada de d² igual a 0
-                    double s = 0;
-                    double v2 = vx * vx + vy * vy;
-                    if (v2 > 0)
-                    {
-                        s = -(px * vx + py * vy) / v2;
-                    }
-
-                    // El mínimo tiene que estar dentro del tramo
-                    if (s < 0)
-                    {
-                        s = 0;
-                    }
-                    if (s > tb - ta)
-                    {
-                        s = tb - ta;
-                    }
-
-                    // Posiciones de los dos aviones en ese momento y su distancia
-                    Position a2 = new Position(pa.GetX() + vax * s, pa.GetY() + vay * s);
-                    Position b2 = new Position(pb.GetX() + vbx * s, pb.GetY() + vby * s);
-                    double d = a2.Distancia(b2);
-
-                    if (d < dMin)
-                    {
-                        dMin = d;
-                        tiempoMinimo = ta + s;
-                    }
-                }
-                i++;
+                t = -(px * vx + py * vy) / v2;
             }
-            return dMin;
+
+            // El instante tiene que estar entre ahora y la llegada del primero
+            if (t < 0)
+            {
+                t = 0;
+            }
+            double limite = Math.Min(TiempoHastaLlegada(), b.TiempoHastaLlegada());
+            if (t > limite)
+            {
+                t = limite;
+            }
+            return t;
+        }
+
+        // Distancia mínima a la que se acercarán los dos aviones
+        public double DistanciaMinima(FlightPlan b)
+        {
+            double t = TiempoMinimo(b);
+            return PosicionEnTiempo(t).Distancia(b.PosicionEnTiempo(t));
         }
 
         // Dice si, siguiendo como van, los dos aviones entrarán en conflicto
         public bool HabraConflicto(FlightPlan b, double distanciaSeguridad)
         {
-            double tiempoMinimo;
-            double dMin = DistanciaMinima(b, out tiempoMinimo);
-            return dMin < distanciaSeguridad;
+            return DistanciaMinima(b) < distanciaSeguridad;
         }
         public void EscribeConsola()
         // escribe en consola los datos del plan de vuelo

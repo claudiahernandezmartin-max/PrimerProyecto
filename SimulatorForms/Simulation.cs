@@ -100,13 +100,10 @@ namespace SimulatorForms
         // Escribe en el label si hay conflicto ahora, si lo habrá o si no
         private void ActualizarEstado()
         {
-            int a, b;
-            double dMin, t;
-
-
             // Distancia entre la pareja de vuelos más cercana ahora mismo
-            int p, q;
-            double dActual = lista.DistanciaMinimaActual(out p, out q);
+            double dActual = lista.DistanciaMinimaActual();
+            int p = lista.GetParejaA();
+            int q = lista.GetParejaB();
             if (p >= 0)
             {
                 labelDistancia.Text = string.Format("Pareja más cercana: {0} y {1} (distancia {2:F2})",
@@ -118,10 +115,12 @@ namespace SimulatorForms
                 labelEstado.Text = "¡CONFLICTO! Hay vuelos a menos de la distancia de seguridad";
                 labelEstado.ForeColor = Color.Red;
             }
-            else if (lista.BuscarConflictoFuturo(distanciaSeguridad, out a, out b, out dMin, out t))
+            else if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
+                int a = lista.GetConflictoA();
+                int b = lista.GetConflictoB();
                 labelEstado.Text = string.Format("Aviso: {0} y {1} entrarán en conflicto (dist. mínima {2:F2} dentro de {3:F1} ciclos)",
-                    lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), dMin, t / tiempoCiclo);
+                    lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), lista.GetConflictoDistancia(), lista.GetConflictoTiempo() / tiempoCiclo);
                 labelEstado.ForeColor = Color.DarkOrange;
             }
             else
@@ -180,15 +179,14 @@ namespace SimulatorForms
 
         private void buttonIniciar_Click(object sender, EventArgs e)
         {
-            int a, b;
-            double dMin, t;
-
             // Antes de empezar, anticipamos el conflicto e informamos al usuario
-            if (lista.BuscarConflictoFuturo(distanciaSeguridad, out a, out b, out dMin, out t))
+            if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
+                int a = lista.GetConflictoA();
+                int b = lista.GetConflictoB();
                 DialogResult respuesta = MessageBox.Show(
                     string.Format("Los vuelos {0} y {1} entrarán en conflicto: se acercarán a {2:F2} (la distancia de seguridad es {3:F2}) dentro de {4:F1} ciclos.\n\n¿Quieres que te proponga cambios de velocidad?",
-                        lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), dMin, distanciaSeguridad, t / tiempoCiclo),
+                        lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), lista.GetConflictoDistancia(), distanciaSeguridad, lista.GetConflictoTiempo() / tiempoCiclo),
                     "Conflicto detectado", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (respuesta == DialogResult.Yes)
@@ -232,7 +230,7 @@ namespace SimulatorForms
             }
             else
             {
-                lista.SetVelocidades(antes);  
+                lista.SetVelocidades(antes);
             }
         }
         private void buttonDetener_Click(object sender, EventArgs e)
@@ -277,12 +275,12 @@ namespace SimulatorForms
         // FASE 10.2: Comprobar si entrarán en conflicto
         private void Conflicte_Click(object sender, EventArgs e)
         {
-            int a, b;
-            double dMin, t;
-            if (lista.BuscarConflictoFuturo(distanciaSeguridad, out a, out b, out dMin, out t))
+            if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
+                int a = lista.GetConflictoA();
+                int b = lista.GetConflictoB();
                 MessageBox.Show(string.Format("Los vuelos {0} y {1} SÍ entrarán en conflicto.\nDistancia mínima: {2:F2}\nDentro de {3:F1} ciclos.",
-                    lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), dMin, t / tiempoCiclo),
+                    lista.GetFlightPlan(a).GetId(), lista.GetFlightPlan(b).GetId(), lista.GetConflictoDistancia(), lista.GetConflictoTiempo() / tiempoCiclo),
                     "Comprobación de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else

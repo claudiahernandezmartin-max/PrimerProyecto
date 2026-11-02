@@ -103,54 +103,106 @@ namespace FlightLib
         public bool HayConflicto(double D)
         { for (int i = 0; i < number; i++) if (EnConflicto(i, D)) return true; return false; }
 
-        // Conflicto FUTURO: primera pareja que entrará en conflicto
-        public bool BuscarConflictoFuturo(double D, out int a, out int b, out double dMin, out double t)
+        // Datos del conflicto futuro encontrado (los rellena BuscarConflictoFuturo)
+        int conflictoA = -1;
+        int conflictoB = -1;
+        double conflictoDistancia = 0;
+        double conflictoTiempo = 0;
+
+        // Datos de la pareja más cercana (los rellena DistanciaMinimaActual)
+        int parejaA = -1;
+        int parejaB = -1;
+
+        // Conflicto FUTURO: busca la primera pareja que entrará en conflicto
+        public bool BuscarConflictoFuturo(double D)
         {
-            a = -1; b = -1; dMin = 0; t = 0;
+            conflictoA = -1;
+            conflictoB = -1;
+            conflictoDistancia = 0;
+            conflictoTiempo = 0;
+
             for (int i = 0; i < number; i++)
             {
                 for (int j = i + 1; j < number; j++)
                 {
-                    double tt, d = vector[i].DistanciaMinima(vector[j], out tt);
+                    double d = vector[i].DistanciaMinima(vector[j]);
                     if (d < D)
                     {
-                        a = i; b = j; dMin = d; t = tt;
+                        conflictoA = i;
+                        conflictoB = j;
+                        conflictoDistancia = d;
+                        conflictoTiempo = vector[i].TiempoMinimo(vector[j]);
                         return true;
                     }
                 }
             }
             return false;
         }
+
+        public int GetConflictoA()
+        {
+            return conflictoA;
+        }
+
+        public int GetConflictoB()
+        {
+            return conflictoB;
+        }
+
+        public double GetConflictoDistancia()
+        {
+            return conflictoDistancia;
+        }
+
+        public double GetConflictoTiempo()
+        {
+            return conflictoTiempo;
+        }
+
         public bool HabraConflicto(double D)
-        { 
-            int a, b; double d, t; 
-            return BuscarConflictoFuturo(D, out a, out b, out d, out t); 
+        {
+            return BuscarConflictoFuturo(D);
         }
 
         // Propone velocidades: frena un vuelo de la pareja (99%..10%) hasta que no haya conflictos
         public bool ResolverConflictos(double D)
         {
             double[] orig = GetVelocidades();
-            int a, b, intentos = 0; double d, t;
-            while (BuscarConflictoFuturo(D, out a, out b, out d, out t) && intentos < 100)
+            int intentos = 0;
+
+            while (BuscarConflictoFuturo(D) == true && intentos < 100)
             {
-                if (!Frenar(b, a, D) && !Frenar(a, b, D)) { SetVelocidades(orig); return false; }
+                int a = conflictoA;
+                int b = conflictoB;
+
+                bool frenado = Frenar(b, a, D);
+                if (frenado == false)
+                {
+                    frenado = Frenar(a, b, D);
+                }
+                if (frenado == false)
+                {
+                    SetVelocidades(orig);
+                    return false;
+                }
                 intentos++;
             }
-            if (HabraConflicto(D)) 
+
+            if (HabraConflicto(D) == true)
             {
-                SetVelocidades(orig); 
+                SetVelocidades(orig);
                 return false;
             }
             return true;
         }
+
         private bool Frenar(int f, int o, double D)
         {
             double v0 = vector[f].GetVelocidad();
             for (int p = 99; p >= 10; p--)
             {
                 vector[f].SetVelocidad(v0 * p / 100.0);
-                if (!vector[f].HabraConflicto(vector[o], D)) 
+                if (!vector[f].HabraConflicto(vector[o], D))
                     return true;
             }
             vector[f].SetVelocidad(v0);
@@ -158,10 +210,10 @@ namespace FlightLib
         }
 
         // Distancia actual entre la pareja de vuelos más cercana
-        public double DistanciaMinimaActual(out int a, out int b)
+        public double DistanciaMinimaActual()
         {
-            a = -1;
-            b = -1;
+            parejaA = -1;
+            parejaB = -1;
             double minima = double.MaxValue;
 
             for (int i = 0; i < number; i++)
@@ -172,12 +224,22 @@ namespace FlightLib
                     if (d < minima)
                     {
                         minima = d;
-                        a = i;
-                        b = j;
+                        parejaA = i;
+                        parejaB = j;
                     }
                 }
             }
             return minima;
+        }
+
+        public int GetParejaA()
+        {
+            return parejaA;
+        }
+
+        public int GetParejaB()
+        {
+            return parejaB;
         }
         public void EscribeConsola()
         {
