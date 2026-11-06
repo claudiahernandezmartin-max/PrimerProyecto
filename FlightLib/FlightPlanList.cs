@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,100 +9,135 @@ namespace FlightLib
 {
     public class FlightPlanList
     {
-        FlightPlan[] vector = new FlightPlan[10];
-        int number = 0;
+        List<FlightPlan> vuelos = new List<FlightPlan>(); // antes era un vector de 10
 
-        public int AddFlightPlan(FlightPlan p)
+        // Añade un vuelo al final de la lista
+        public void AddFlightPlan(FlightPlan p)
         {
-
-            if (number == 10)
-            {
-                return -1;
-            }
-
-            vector[number] = p;
-            number++;
-            return 0;
+            vuelos.Add(p);
         }
         public FlightPlan GetFlightPlan(int i)
         {
-            if (i < 0 || i >= number)
+            if (i < 0 || i >= vuelos.Count)
             {
                 return null;
             }
 
-            return vector[i];
+            return vuelos[i];
         }
         // Borra los vuelos guardados para poder meter los nuevos
         public void Vaciar()
         {
-            number = 0;
+            vuelos.Clear();
         }
+
+        // Carga los vuelos del fichero (una línea por vuelo: id xi yi xf yf velocidad)
+        // Devuelve 0 si va bien, -1 si el fichero no existe y -2 si hay datos mal escritos
+        public int CargarFichero(string nombreFichero)
+        {
+            StreamReader F = null;
+            try
+            {
+                F = new StreamReader(nombreFichero);
+
+                // Los guardamos aparte para no perder los vuelos que había si el fichero está mal
+                List<FlightPlan> nuevos = new List<FlightPlan>();
+
+                string linea = F.ReadLine();
+                while (linea != null)
+                {
+                    string[] trozos = linea.Split(' ');
+                    string id = trozos[0];
+                    double xi = Convert.ToDouble(trozos[1]);
+                    double yi = Convert.ToDouble(trozos[2]);
+                    double xf = Convert.ToDouble(trozos[3]);
+                    double yf = Convert.ToDouble(trozos[4]);
+                    double velocidad = Convert.ToDouble(trozos[5]);
+
+                    nuevos.Add(new FlightPlan(id, xi, yi, xf, yf, velocidad));
+                    linea = F.ReadLine();
+                }
+                F.Close();
+
+                vuelos = nuevos;
+                return 0;
+            }
+            catch (FileNotFoundException)
+            {
+                return -1;
+            }
+            catch (FormatException)
+            {
+                F.Close();
+                return -2;
+            }
+        }
+
         public void Mover(double tiempo)
         {
             int i = 0;
-            while (i < number)
+            while (i < vuelos.Count)
             {
-                if (vector[i].HasArrived() == false)
+                if (vuelos[i].HasArrived() == false)
                 {
-                    vector[i].Move(tiempo);
+                    vuelos[i].Move(tiempo);
                 }
                 i++;
             }
 
         }
-        public int GetNumber() 
-        { 
-            return number; 
+        public int GetNumber()
+        {
+            return vuelos.Count;
         }
 
         public bool TodosHanLlegado()
         {
-            for (int i = 0; i < number; i++)
+            for (int i = 0; i < vuelos.Count; i++)
             {
-                if (!vector[i].HasArrived())
+                if (!vuelos[i].HasArrived())
                     return false;
             }
-            return true; 
+            return true;
         }
 
         public void Restart()
         {
-            for (int i = 0; i < number; i++)
-                vector[i].Restart();
+            for (int i = 0; i < vuelos.Count; i++)
+                vuelos[i].Restart();
         }
-        public void RestaurarVelocidadesIniciales() 
-        { 
-            for (int i = 0; i < number; i++) 
-                vector[i].RestaurarVelocidadInicial(); 
+        public void RestaurarVelocidadesIniciales()
+        {
+            for (int i = 0; i < vuelos.Count; i++)
+                vuelos[i].RestaurarVelocidadInicial();
         }
 
         public double[] GetVelocidades()
-        { 
-            double[] v = new double[number]; 
-            for (int i = 0; i < number; i++) 
-                v[i] = vector[i].GetVelocidad(); 
-            return v; 
+        {
+            double[] v = new double[vuelos.Count];
+            for (int i = 0; i < vuelos.Count; i++)
+                v[i] = vuelos[i].GetVelocidad();
+            return v;
         }
         public void SetVelocidades(double[] v)
-        { 
-            for (int i = 0; i < number && i < v.Length; i++) 
-                vector[i].SetVelocidad(v[i]); 
+        {
+            for (int i = 0; i < vuelos.Count && i < v.Length; i++)
+                vuelos[i].SetVelocidad(v[i]);
         }
 
         // Conflicto AHORA (para pintar en rojo)
         public bool EnConflicto(int i, double D)
         {
-            for (int j = 0; j < number; j++)
+            for (int j = 0; j < vuelos.Count; j++)
             {
-                if (j != i && vector[i].Conflicto(vector[j], D))
+                if (j != i && vuelos[i].Conflicto(vuelos[j], D))
                     return true;
             }
-                return false;
-            
+            return false;
+
         }
         public bool HayConflicto(double D)
-        { for (int i = 0; i < number; i++) if (EnConflicto(i, D)) return true; return false; }
+        { for (int i = 0; i < vuelos.Count; i++) if (EnConflicto(i, D)) return true; return false; }
 
         // Datos del conflicto futuro encontrado (los rellena BuscarConflictoFuturo)
         int conflictoA = -1;
@@ -121,17 +157,17 @@ namespace FlightLib
             conflictoDistancia = 0;
             conflictoTiempo = 0;
 
-            for (int i = 0; i < number; i++)
+            for (int i = 0; i < vuelos.Count; i++)
             {
-                for (int j = i + 1; j < number; j++)
+                for (int j = i + 1; j < vuelos.Count; j++)
                 {
-                    double d = vector[i].DistanciaMinima(vector[j]);
+                    double d = vuelos[i].DistanciaMinima(vuelos[j]);
                     if (d < D)
                     {
                         conflictoA = i;
                         conflictoB = j;
                         conflictoDistancia = d;
-                        conflictoTiempo = vector[i].TiempoMinimo(vector[j]);
+                        conflictoTiempo = vuelos[i].TiempoMinimo(vuelos[j]);
                         return true;
                     }
                 }
@@ -198,14 +234,14 @@ namespace FlightLib
 
         private bool Frenar(int f, int o, double D)
         {
-            double v0 = vector[f].GetVelocidad();
+            double v0 = vuelos[f].GetVelocidad();
             for (int p = 99; p >= 10; p--)
             {
-                vector[f].SetVelocidad(v0 * p / 100.0);
-                if (!vector[f].HabraConflicto(vector[o], D))
+                vuelos[f].SetVelocidad(v0 * p / 100.0);
+                if (!vuelos[f].HabraConflicto(vuelos[o], D))
                     return true;
             }
-            vector[f].SetVelocidad(v0);
+            vuelos[f].SetVelocidad(v0);
             return false;
         }
 
@@ -216,11 +252,11 @@ namespace FlightLib
             parejaB = -1;
             double minima = double.MaxValue;
 
-            for (int i = 0; i < number; i++)
+            for (int i = 0; i < vuelos.Count; i++)
             {
-                for (int j = i + 1; j < number; j++)
+                for (int j = i + 1; j < vuelos.Count; j++)
                 {
-                    double d = vector[i].GetCurrentPosition().Distancia(vector[j].GetCurrentPosition());
+                    double d = vuelos[i].GetCurrentPosition().Distancia(vuelos[j].GetCurrentPosition());
                     if (d < minima)
                     {
                         minima = d;
@@ -244,9 +280,9 @@ namespace FlightLib
         public void EscribeConsola()
         {
             int i = 0;
-            while (i < number)
+            while (i < vuelos.Count)
             {
-                vector[i].EscribeConsola();
+                vuelos[i].EscribeConsola();
                 i++;
             }
         }

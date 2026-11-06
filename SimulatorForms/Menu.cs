@@ -61,5 +61,33 @@ namespace SimulatorForms
                 tiempoCiclo = f.GetCiclo();
             }
         }
+
+        // Elige el fichero de vuelos con un OpenFileDialog y lo carga en la lista
+        private void cargarPlanesDesdeFicheroToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialogo = new OpenFileDialog();
+
+            if (dialogo.ShowDialog() == DialogResult.OK)
+            {
+                int resultado = lista.CargarFichero(dialogo.FileName);
+
+                if (resultado == -1)
+                {
+                    MessageBox.Show("El fichero no existe.");
+                }
+                else if (resultado == -2)
+                {
+                    MessageBox.Show("Hay datos mal escritos en el fichero.");
+                }
+                else if (lista.GetNumber() == 0)
+                {
+                    MessageBox.Show("El fichero está vacío.");
+                }
+                else
+                {
+                    MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos.");
+                }
+            }
+        }
     }
 }
