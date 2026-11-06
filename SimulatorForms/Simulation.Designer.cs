@@ -58,14 +58,14 @@ namespace SimulatorForms
             this.panelSimulacion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelSimulacion.Location = new System.Drawing.Point(12, 12);
             this.panelSimulacion.Name = "panelSimulacion";
-            this.panelSimulacion.Size = new System.Drawing.Size(490, 400);
+            this.panelSimulacion.Size = new System.Drawing.Size(826, 576);
             this.panelSimulacion.TabIndex = 0;
             this.panelSimulacion.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSimulacion_Paint);
             this.panelSimulacion.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelSimulacion_MouseClick);
             // 
             // buttonMover
             // 
-            this.buttonMover.Location = new System.Drawing.Point(624, 12);
+            this.buttonMover.Location = new System.Drawing.Point(857, 49);
             this.buttonMover.Name = "buttonMover";
             this.buttonMover.Size = new System.Drawing.Size(143, 61);
             this.buttonMover.TabIndex = 1;
@@ -75,7 +75,7 @@ namespace SimulatorForms
             // 
             // buttonIniciar
             // 
-            this.buttonIniciar.Location = new System.Drawing.Point(624, 91);
+            this.buttonIniciar.Location = new System.Drawing.Point(857, 128);
             this.buttonIniciar.Name = "buttonIniciar";
             this.buttonIniciar.Size = new System.Drawing.Size(143, 63);
             this.buttonIniciar.TabIndex = 2;
@@ -86,7 +86,7 @@ namespace SimulatorForms
             // buttonDetener
             // 
             this.buttonDetener.Enabled = false;
-            this.buttonDetener.Location = new System.Drawing.Point(624, 179);
+            this.buttonDetener.Location = new System.Drawing.Point(857, 216);
             this.buttonDetener.Name = "buttonDetener";
             this.buttonDetener.Size = new System.Drawing.Size(143, 64);
             this.buttonDetener.TabIndex = 3;
@@ -100,7 +100,7 @@ namespace SimulatorForms
             // 
             // buttonVerDatos
             // 
-            this.buttonVerDatos.Location = new System.Drawing.Point(624, 268);
+            this.buttonVerDatos.Location = new System.Drawing.Point(857, 305);
             this.buttonVerDatos.Name = "buttonVerDatos";
             this.buttonVerDatos.Size = new System.Drawing.Size(143, 64);
             this.buttonVerDatos.TabIndex = 4;
@@ -110,7 +110,7 @@ namespace SimulatorForms
             // 
             // Conflicte
             // 
-            this.Conflicte.Location = new System.Drawing.Point(624, 355);
+            this.Conflicte.Location = new System.Drawing.Point(857, 392);
             this.Conflicte.Name = "Conflicte";
             this.Conflicte.Size = new System.Drawing.Size(143, 68);
             this.Conflicte.TabIndex = 5;
@@ -120,7 +120,7 @@ namespace SimulatorForms
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(624, 445);
+            this.button1.Location = new System.Drawing.Point(857, 482);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 61);
             this.button1.TabIndex = 6;
@@ -131,7 +131,7 @@ namespace SimulatorForms
             // labelEstado
             // 
             this.labelEstado.AutoSize = true;
-            this.labelEstado.Location = new System.Drawing.Point(237, 467);
+            this.labelEstado.Location = new System.Drawing.Point(293, 640);
             this.labelEstado.Name = "labelEstado";
             this.labelEstado.Size = new System.Drawing.Size(50, 16);
             this.labelEstado.TabIndex = 7;
@@ -140,7 +140,7 @@ namespace SimulatorForms
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(795, 12);
+            this.label1.Location = new System.Drawing.Point(1028, 49);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(137, 16);
             this.label1.TabIndex = 8;
@@ -155,7 +155,7 @@ namespace SimulatorForms
             this.dataGridViewVelocidades.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.columnaVuelo,
             this.columnaVelocidad});
-            this.dataGridViewVelocidades.Location = new System.Drawing.Point(798, 50);
+            this.dataGridViewVelocidades.Location = new System.Drawing.Point(1031, 87);
             this.dataGridViewVelocidades.Name = "dataGridViewVelocidades";
             this.dataGridViewVelocidades.RowHeadersVisible = false;
             this.dataGridViewVelocidades.RowHeadersWidth = 51;
@@ -178,7 +178,7 @@ namespace SimulatorForms
             // 
             // buttonVelocidadesOriginales
             // 
-            this.buttonVelocidadesOriginales.Location = new System.Drawing.Point(855, 226);
+            this.buttonVelocidadesOriginales.Location = new System.Drawing.Point(1088, 263);
             this.buttonVelocidadesOriginales.Name = "buttonVelocidadesOriginales";
             this.buttonVelocidadesOriginales.Size = new System.Drawing.Size(143, 64);
             this.buttonVelocidadesOriginales.TabIndex = 10;
@@ -189,7 +189,7 @@ namespace SimulatorForms
             // labelDistancia
             // 
             this.labelDistancia.AutoSize = true;
-            this.labelDistancia.Location = new System.Drawing.Point(66, 428);
+            this.labelDistancia.Location = new System.Drawing.Point(122, 601);
             this.labelDistancia.Name = "labelDistancia";
             this.labelDistancia.Size = new System.Drawing.Size(128, 16);
             this.labelDistancia.TabIndex = 11;
@@ -200,7 +200,7 @@ namespace SimulatorForms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1112, 523);
+            this.ClientSize = new System.Drawing.Size(1332, 686);
             this.Controls.Add(this.labelDistancia);
             this.Controls.Add(this.buttonVelocidadesOriginales);
             this.Controls.Add(this.dataGridViewVelocidades);
