@@ -41,10 +41,10 @@
             this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.planesDeVueloToolStripMenuItem,
+            this.cargarPlanesDesdeFicheroToolStripMenuItem,
             this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem,
             this.simulacionToolStripMenuItem,
-            this.cargarPlanesDesdeFicheroToolStripMenuItem});
+            this.planesDeVueloToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
@@ -70,7 +70,7 @@
             // 
             this.simulacionToolStripMenuItem.Name = "simulacionToolStripMenuItem";
             this.simulacionToolStripMenuItem.Size = new System.Drawing.Size(151, 38);
-            this.simulacionToolStripMenuItem.Text = "Simulacion";
+            this.simulacionToolStripMenuItem.Text = "Simulación";
             this.simulacionToolStripMenuItem.Click += new System.EventHandler(this.simulacionToolStripMenuItem_Click);
             // 
             // cargarPlanesDesdeFicheroToolStripMenuItem
@@ -88,7 +88,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Menu";
-            this.Text = "Form1";
+            this.Text = "Deconflicting tool";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -105,4 +105,3 @@
         private System.Windows.Forms.ToolStripMenuItem cargarPlanesDesdeFicheroToolStripMenuItem;
     }
 }
-

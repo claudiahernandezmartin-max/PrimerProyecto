@@ -59,6 +59,10 @@ namespace SimulatorForms
             {
                 MessageBox.Show("Hay algún dato mal escrito. Revisa que los números sean correctos.");
             }
+            catch (OverflowException)
+            {
+                MessageBox.Show("Alguno de los números es demasiado grande.");
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Drawing;
-using System.Windows.Forms; 
+using System.Windows.Forms;
 using FlightLib;
 
 namespace SimulatorForms
@@ -61,7 +61,6 @@ namespace SimulatorForms
             this.panelSimulacion.Size = new System.Drawing.Size(826, 576);
             this.panelSimulacion.TabIndex = 0;
             this.panelSimulacion.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSimulacion_Paint);
-            this.panelSimulacion.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelSimulacion_MouseClick);
             // 
             // buttonMover
             // 
@@ -214,7 +213,7 @@ namespace SimulatorForms
             this.Controls.Add(this.buttonMover);
             this.Controls.Add(this.panelSimulacion);
             this.Name = "Simulation";
-            this.Text = "Form1";
+            this.Text = "Simulación";
             this.Load += new System.EventHandler(this.Simulation_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewVelocidades)).EndInit();
             this.ResumeLayout(false);

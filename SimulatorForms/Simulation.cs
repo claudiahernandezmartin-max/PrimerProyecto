@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using FlightLib;
@@ -11,6 +12,9 @@ namespace SimulatorForms
         double distanciaSeguridad;
         double tiempoCiclo;
 
+        List<PictureBox> aviones = new List<PictureBox>();   // un PictureBox por vuelo
+        int tamanoAvion = 32;                                // lado en píxeles de cada PictureBox
+
         bool alarmaActivada = false;
         bool cargandoTabla = false;    // ← NUEVO: se usa en el punto 18 (tabla de velocidades)
 
@@ -22,6 +26,8 @@ namespace SimulatorForms
             this.distanciaSeguridad = distanciaSeguridad;
             this.tiempoCiclo = tiempoCiclo;
 
+            CrearAviones();
+            ColocarAviones();
             CargarTablaVelocidades();  // ← NUEVO: rellena la tabla de velocidades (punto 18)
             ActualizarEstado();
         }
@@ -70,10 +76,6 @@ namespace SimulatorForms
                 g.FillEllipse(Estilo.PincelSuave(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
                 g.DrawEllipse(Estilo.LapizElipse(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
 
-                // Avión con la silueta de Estilo, girado hacia su destino
-                float angulo = (float)(Math.Atan2(final.GetY() - inicio.GetY(), final.GetX() - inicio.GetX()) * 180 / Math.PI);
-                Estilo.DibujarAvion(g, x, y, 0.12f, angulo, color);
-
                 // Identificador al lado del avión
                 g.DrawString(plan.GetId(), Estilo.FuenteNormal, new SolidBrush(color), x + 12, y + 8);
 
@@ -85,6 +87,7 @@ namespace SimulatorForms
         {
             // Mueve todos los vuelos que no han llegado (punto 6)
             lista.Mover(tiempoCiclo);
+            ColocarAviones();
             panelSimulacion.Invalidate();
 
             // Después de mover, comprobamos si hay conflicto
@@ -145,36 +148,69 @@ namespace SimulatorForms
                 alarmaActivada = false;
             }
         }
-        private void panelSimulacion_MouseClick(object sender, MouseEventArgs e)
+        // Crea un PictureBox por cada vuelo con la silueta del avión girada hacia su destino
+        private void CrearAviones()
         {
-            Position clic = new Position(e.X, e.Y);
-
             int i = 0;
-            bool encontrado = false;
-            while (i < lista.GetNumber() && encontrado == false)
+            while (i < lista.GetNumber())
             {
                 FlightPlan plan = lista.GetFlightPlan(i);
+                Color color = Estilo.ColoresAvion[i % Estilo.ColoresAvion.Length];
 
-                // Si el clic está cerca del avión, mostramos sus datos
-                if (plan.GetCurrentPosition().Distancia(clic) <= 12)
-                {
-                    string texto = "Identificador: " + plan.GetId() +
-                        "\nVelocidad: " + plan.GetVelocidad().ToString("F2") +
-                        "\nPosición actual: (" + plan.GetCurrentPosition().GetX().ToString("F2") + ", " +
-                                                 plan.GetCurrentPosition().GetY().ToString("F2") + ")" +
-                        "\nDestino: (" + plan.GetFinalPosition().GetX().ToString("F2") + ", " +
-                                         plan.GetFinalPosition().GetY().ToString("F2") + ")";
+                Position inicio = plan.GetInitialPosition();
+                Position final = plan.GetFinalPosition();
+                float angulo = (float)(Math.Atan2(final.GetY() - inicio.GetY(), final.GetX() - inicio.GetX()) * 180 / Math.PI);
 
-                    if (plan.HasArrived())
-                    {
-                        texto = texto + "\nHa llegado al destino";
-                    }
+                // La silueta se dibuja una sola vez en una imagen
+                Bitmap dibujo = new Bitmap(tamanoAvion, tamanoAvion);
+                Graphics g = Graphics.FromImage(dibujo);
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                Estilo.DibujarAvion(g, tamanoAvion / 2f, tamanoAvion / 2f, 0.12f, angulo, color);
+                g.Dispose();
 
-                    MessageBox.Show(texto, "Vuelo " + plan.GetId());
-                    encontrado = true; // solo mostramos uno aunque haya dos muy juntos
-                }
+                PictureBox avion = new PictureBox();
+                avion.Size = new Size(tamanoAvion, tamanoAvion);
+                avion.BackColor = Color.Transparent;
+                avion.Image = dibujo;
+                avion.MouseClick += new MouseEventHandler(avion_MouseClick);
+
+                panelSimulacion.Controls.Add(avion);
+                aviones.Add(avion);
                 i++;
             }
+        }
+
+        // Pone cada PictureBox sobre la posición actual de su vuelo
+        private void ColocarAviones()
+        {
+            int i = 0;
+            while (i < aviones.Count)
+            {
+                Position p = lista.GetFlightPlan(i).GetCurrentPosition();
+                aviones[i].Location = new Point((int)p.GetX() - tamanoAvion / 2, (int)p.GetY() - tamanoAvion / 2);
+                i++;
+            }
+        }
+
+        // Al hacer clic en un avión, muestra los datos de su vuelo
+        private void avion_MouseClick(object sender, MouseEventArgs e)
+        {
+            PictureBox avion = (PictureBox)sender;
+            FlightPlan plan = lista.GetFlightPlan(aviones.IndexOf(avion));
+
+            string texto = "Identificador: " + plan.GetId() +
+                "\nVelocidad: " + plan.GetVelocidad().ToString("F2") +
+                "\nPosición actual: (" + plan.GetCurrentPosition().GetX().ToString("F2") + ", " +
+                                         plan.GetCurrentPosition().GetY().ToString("F2") + ")" +
+                "\nDestino: (" + plan.GetFinalPosition().GetX().ToString("F2") + ", " +
+                                 plan.GetFinalPosition().GetY().ToString("F2") + ")";
+
+            if (plan.HasArrived())
+            {
+                texto = texto + "\nHa llegado al destino";
+            }
+
+            MessageBox.Show(texto, "Vuelo " + plan.GetId());
         }
 
         private void buttonIniciar_Click(object sender, EventArgs e)
@@ -244,6 +280,7 @@ namespace SimulatorForms
         {
             // Mueve todos los vuelos que no han llegado
             lista.Mover(tiempoCiclo);
+            ColocarAviones();
             panelSimulacion.Invalidate();
             ActualizarEstado();
 
@@ -300,6 +337,7 @@ namespace SimulatorForms
         {
             timerSimulacion.Stop();
             lista.Restart();            // ← en vez de plan1.Restart(); plan2.Restart();
+            ColocarAviones();
             alarmaActivada = false;
 
             buttonIniciar.Enabled = true;
