@@ -96,6 +96,10 @@ namespace SimulatorForms
             {
                 MessageBox.Show("Hay algún dato mal escrito. Revisa que los números sean correctos.");
             }
+            catch (OverflowException)
+            {
+                MessageBox.Show("Alguno de los números es demasiado grande.");
+            }
             catch (ArgumentException ex)
             {
                 MessageBox.Show(ex.Message);

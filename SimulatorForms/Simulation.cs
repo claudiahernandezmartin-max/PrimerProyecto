@@ -198,7 +198,7 @@ namespace SimulatorForms
             PictureBox avion = (PictureBox)sender;
             FlightPlan plan = lista.GetFlightPlan(aviones.IndexOf(avion));
 
-            string texto = "Identificador: " + plan.GetId() +
+            string texto = "Identificador: " + plan.GetId() + "\nCompañía: " + plan.GetCompania() +
                 "\nVelocidad: " + plan.GetVelocidad().ToString("F2") +
                 "\nPosición actual: (" + plan.GetCurrentPosition().GetX().ToString("F2") + ", " +
                                          plan.GetCurrentPosition().GetY().ToString("F2") + ")" +
@@ -392,6 +392,11 @@ namespace SimulatorForms
             {
                 valida = false;
                 MessageBox.Show("La velocidad tiene que ser mayor que 0.");
+            }
+            catch (OverflowException)
+            {
+                valida = false;
+                MessageBox.Show("La velocidad es demasiado grande.");
             }
 
             // Esperamos a que la tabla acabe de editar, la recargamos y, solo si era válida, reiniciamos

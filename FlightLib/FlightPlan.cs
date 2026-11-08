@@ -156,7 +156,43 @@ namespace FlightLib
         { 
             return velocidadInicial; 
         }
+        public string GetCompania()
+        {
+            // Partimos el identificador por los números: la primera parte son las letras
+            string[] trozos = id.Split('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+            string prefijo = trozos[0];
 
+            string compania = "Desconocida";
+            if (prefijo == "IB")
+            {
+                compania = "Iberia";
+            }
+            else if (prefijo == "VY" || prefijo == "VLG")
+            {
+                compania = "Vueling";
+            }
+            else if (prefijo == "RYR")
+            {
+                compania = "Ryanair";
+            }
+            else if (prefijo == "EZY")
+            {
+                compania = "easyJet";
+            }
+            else if (prefijo == "AEA")
+            {
+                compania = "Air Europa";
+            }
+            else if (prefijo == "TAP")
+            {
+                compania = "TAP Air Portugal";
+            }
+            else if (prefijo == "KLM")
+            {
+                compania = "KLM";
+            }
+            return compania;
+        }
         //Fer métode que detecti quan hi ha dos vols que estan més aprop de la distància de seguretat 
         public bool Conflicto(FlightPlan b, double distanciaSeguridad)
         {  

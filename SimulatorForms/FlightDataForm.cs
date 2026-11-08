@@ -28,6 +28,7 @@ namespace SimulatorForms
         {
             DataTable tabla = new DataTable();
             tabla.Columns.Add("Identificador");
+            tabla.Columns.Add("Compañía");
             tabla.Columns.Add("Velocidad");
             tabla.Columns.Add("Posición Actual");
             tabla.Columns.Add("Ha llegado");
@@ -43,12 +44,14 @@ namespace SimulatorForms
                 }
                 tabla.Rows.Add(
                     plan.GetId(),
+                    plan.GetCompania(),
                     plan.GetVelocidad().ToString("F2"),
                     string.Format("({0:F2}, {1:F2})", plan.GetCurrentPosition().GetX(), plan.GetCurrentPosition().GetY()),
                     llegado
                 );
                 i++;
             }
+            //Hem afegit el metode GetCompania per mostrar la companya a la taula de vols
 
             dataGridViewVuelos.DataSource = tabla;
             dataGridViewVuelos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
