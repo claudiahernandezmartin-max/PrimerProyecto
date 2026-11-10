@@ -7,7 +7,6 @@ namespace SimulatorForms
 {
     public partial class FlightDataForm : Form
     {
-        FlightPlan plan1;
         FlightPlanList lista;
 
         public FlightDataForm(FlightPlanList lista)

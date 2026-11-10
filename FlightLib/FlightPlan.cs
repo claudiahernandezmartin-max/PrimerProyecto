@@ -17,6 +17,11 @@ namespace FlightLib
         Position initialPosition; // posicion inicial
         double velocidad;
         double velocidadInicial; // para el Reset
+        double velocidadMaxima = 600; // ningún avión puede ir más rápido que esto
+
+        // Resultado del último cálculo de CalcularMinimo
+        double minimoDistancia;
+        double minimoTiempo;
 
         // Constructures
         public FlightPlan(string id, double cpx, double cpy, double fpx, double fpy, double velocidad)
@@ -34,6 +39,18 @@ namespace FlightLib
             this.velocidadInicial = velocidad;
         }
 
+        // Dice si una velocidad está permitida: mayor que 0 y no más que la máxima
+        public bool VelocidadValida(double v)
+        {
+            return v > 0 && v <= velocidadMaxima;
+        }
+
+        // getter de la velocidad máxima permitida
+        public double GetVelocidadMaxima()
+        {
+            return velocidadMaxima;
+        }
+
         // Gets i Sets
 
         // getter de atribut velocidad
@@ -43,14 +60,15 @@ namespace FlightLib
         }
 
         // setter de atribut velocidad
-        public void SetVelocidad(double velocidad)
+        // Solo cambia la velocidad si es válida. Devuelve true si la ha cambiado y false si no
+        public bool SetVelocidad(double velocidad)
         {
-            // Velocidades negativas NO
-            if (velocidad <= 0)
+            if (VelocidadValida(velocidad) == false)
             {
-                throw new ArgumentException("La velocidad tiene que ser mayor que 0.");
+                return false;
             }
             this.velocidad = velocidad;
+            return true;
         }
 
         // getter de atribut id
@@ -244,50 +262,160 @@ namespace FlightLib
             }
             return resultado;
         }
-        // Instante (en minutos) en el que los dos aviones están más cerca
-        public double TiempoMinimo(FlightPlan b)
+        // Instante entre inicio y fin en el que este avión y b están más cerca y se calcula con la derivada de la distancia al cuadrado igualada a 0
+        private double MinimoEnTramo(FlightPlan b, double inicio, double fin)
         {
-            // Posición y velocidad de b respecto a este avión
-            double px = b.currentPosition.GetX() - currentPosition.GetX();
-            double py = b.currentPosition.GetY() - currentPosition.GetY();
-            double vx = b.GetVelocidadX() - GetVelocidadX();
-            double vy = b.GetVelocidadY() - GetVelocidadY();
+            // Dónde están los dos al empezar el tramo
+            Position pa = PosicionEnTiempo(inicio);
+            Position pb = b.PosicionEnTiempo(inicio);
 
-            // d²(t) = (px + vx·t)² + (py + vy·t)²
-            // Derivada: d²'(t) = 2·(px + vx·t)·vx + 2·(py + vy·t)·vy
-            // Igualamos a 0 (mínimo) y despejamos: t = -(px·vx + py·vy) / (vx² + vy²)
-            double t = 0;
+            // Velocidad de cada uno en el tramo (si ya ha llegado, está parado)
+            double vax = 0;
+            double vay = 0;
+            double vbx = 0;
+            double vby = 0;
+            if (inicio < TiempoHastaLlegada())
+            {
+                vax = GetVelocidadX();
+                vay = GetVelocidadY();
+            }
+            if (inicio < b.TiempoHastaLlegada())
+            {
+                vbx = b.GetVelocidadX();
+                vby = b.GetVelocidadY();
+            }
+
+            // Posición y velocidad de b respecto a este avión
+            double px = pb.GetX() - pa.GetX();
+            double py = pb.GetY() - pa.GetY();
+            double vx = vbx - vax;
+            double vy = vby - vay;
+
+            // d²(s) = (px + vx·s)² + (py + vy·s)²
+            // Derivada: 2·(px + vx·s)·vx + 2·(py + vy·s)·vy = 0  ->  s = -(px·vx + py·vy) / (vx² + vy²)
+            double s = 0;
             double v2 = vx * vx + vy * vy;
             if (v2 > 0)
             {
-                t = -(px * vx + py * vy) / v2;
+                s = -(px * vx + py * vy) / v2;
             }
 
-            // El instante tiene que estar entre ahora y la llegada del primero
-            if (t < 0)
+            // El mínimo tiene que caer dentro del tramo
+            if (s < 0)
             {
-                t = 0;
+                s = 0;
             }
-            double limite = Math.Min(TiempoHastaLlegada(), b.TiempoHastaLlegada());
-            if (t > limite)
+            if (s > fin - inicio)
             {
-                t = limite;
+                s = fin - inicio;
             }
-            return t;
+            return inicio + s;
+        }
+
+        // Calcula cuándo y a qué distancia pasarán más cerca este avión y b
+        private void CalcularMinimo(FlightPlan b)
+        {
+            double primeraLlegada = Math.Min(TiempoHastaLlegada(), b.TiempoHastaLlegada());
+            double ultimaLlegada = Math.Max(TiempoHastaLlegada(), b.TiempoHastaLlegada());
+
+            // Tramo 1: desde ahora hasta que llega el primero
+            minimoTiempo = MinimoEnTramo(b, 0, primeraLlegada);
+            minimoDistancia = PosicionEnTiempo(minimoTiempo).Distancia(b.PosicionEnTiempo(minimoTiempo));
+
+            // Tramo 2: desde que llega el primero hasta que llega el segundo
+            double t2 = MinimoEnTramo(b, primeraLlegada, ultimaLlegada);
+            double d2 = PosicionEnTiempo(t2).Distancia(b.PosicionEnTiempo(t2));
+            if (d2 < minimoDistancia)
+            {
+                minimoDistancia = d2;
+                minimoTiempo = t2;
+            }
+        }
+
+        // Instante (en minutos) en el que los dos aviones están más cerca
+        public double TiempoMinimo(FlightPlan b)
+        {
+            CalcularMinimo(b);
+            return minimoTiempo;
         }
 
         // Distancia mínima a la que se acercarán los dos aviones
         public double DistanciaMinima(FlightPlan b)
         {
-            double t = TiempoMinimo(b);
-            return PosicionEnTiempo(t).Distancia(b.PosicionEnTiempo(t));
+            CalcularMinimo(b);
+            return minimoDistancia;
         }
-
         // Dice si, siguiendo como van, los dos aviones entrarán en conflicto
         public bool HabraConflicto(FlightPlan b, double distanciaSeguridad)
         {
             return DistanciaMinima(b) < distanciaSeguridad;
         }
+        // Calcula con la derivada las velocidades de este avión con las que pasaría justo a la distancia de seguridad del avión b (una frenando y otra acelerando).
+        
+        public List<double> VelocidadesSinConflicto(FlightPlan b, double D)
+        {
+            List<double> resultado = new List<double>();
+
+            double hipotenusa = currentPosition.Distancia(finalPosition);
+            if (hipotenusa == 0)
+            {
+                return resultado; // ya ha llegado: cambiar su velocidad no sirve
+            }
+
+            // u = dirección de este avión (vector de módulo 1)
+            double ux = (finalPosition.GetX() - currentPosition.GetX()) / hipotenusa;
+            double uy = (finalPosition.GetY() - currentPosition.GetY()) / hipotenusa;
+
+            // P = posición relativa (este - b) y vB = velocidad del otro avión
+            double px = currentPosition.GetX() - b.currentPosition.GetX();
+            double py = currentPosition.GetY() - b.currentPosition.GetY();
+            double vbx = b.GetVelocidadX();
+            double vby = b.GetVelocidadY();
+
+            // Con k = nueva velocidad / 60, la velocidad relativa es V = k·u - vB.
+            // Con la derivada sale t* = -(P·V)/|V|² y la distancia mínima d_min² = (P×V)² / |V|².
+            // Si pedimos d_min = D queda una ecuación de segundo grado en k: a·k² + bb·k + c = 0
+            double c1 = px * uy - py * ux;      // P×u
+            double c0 = px * vby - py * vbx;    // P×vB
+            double uv = ux * vbx + uy * vby;    // u·vB
+            double vb2 = vbx * vbx + vby * vby; // |vB|²
+
+            double a = c1 * c1 - D * D;
+            double bb = 2 * (D * D * uv - c1 * c0);
+            double c = c0 * c0 - D * D * vb2;
+
+            // Soluciones de la ecuación de segundo grado
+            List<double> soluciones = new List<double>();
+            if (a != 0)
+            {
+                double discriminante = bb * bb - 4 * a * c;
+                if (discriminante >= 0)
+                {
+                    soluciones.Add((-bb + Math.Sqrt(discriminante)) / (2 * a));
+                    soluciones.Add((-bb - Math.Sqrt(discriminante)) / (2 * a));
+                }
+            }
+            else if (bb != 0)
+            {
+                soluciones.Add(-c / bb);
+            }
+
+            // Pasamos k a velocidad y probamos un 1% por debajo y por encima para no quedarnos justo en D
+            for (int i = 0; i < soluciones.Count; i++)
+            {
+                double v = soluciones[i] * 60;
+                if (VelocidadValida(v * 0.99))
+                {
+                    resultado.Add(v * 0.99);
+                }
+                if (VelocidadValida(v * 1.01))
+                {
+                    resultado.Add(v * 1.01);
+                }
+            }
+            return resultado;
+        }
+
         public void EscribeConsola()
         // escribe en consola los datos del plan de vuelo
         {

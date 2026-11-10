@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FlightLib;
+using System.IO;
 
 namespace SimulatorForms
 {
@@ -86,7 +87,7 @@ namespace SimulatorForms
                 }
                 else if (resultado == -3)
                 {
-                    MessageBox.Show("Alguna velocidad del fichero no es mayor que 0.");
+                    MessageBox.Show("Alguna velocidad del fichero no está permitida (tiene que ser mayor que 0 y como máximo 600).");
                 }
                 else if (lista.GetNumber() == 0)
                 {
@@ -97,6 +98,45 @@ namespace SimulatorForms
                     reiniciar = false; // la simulación seguirá desde la posición guardada
                     MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos.");
                 }
+            }
+        }
+        // Carga el fichero de prueba sin tener que buscarlo (está en bin\Debug, junto al programa)
+        private void cargarVuelosDePruebaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int resultado = lista.CargarFichero("Fichero Vuelos Prueba.txt");
+
+            if (resultado == -1)
+            {
+                MessageBox.Show("No se encuentra el fichero Fichero Vuelos Prueba.txt.");
+            }
+            else if (resultado == -2 || resultado == -3)
+            {
+                MessageBox.Show("El fichero de prueba tiene datos mal escritos.");
+            }
+            else
+            {
+                reiniciar = false;
+                MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos de prueba.");
+            }
+        }
+
+        // Carga los vuelos que se guardaron con el botón Guardar, para seguir donde se dejó
+        private void continuarSimulacionGuardadaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int resultado = lista.CargarFichero("vuelos_guardados.txt");
+
+            if (resultado == -1)
+            {
+                MessageBox.Show("Todavía no hay ninguna simulación guardada.");
+            }
+            else if (resultado == -2 || resultado == -3)
+            {
+                MessageBox.Show("El fichero vuelos_guardados.txt tiene datos mal escritos.");
+            }
+            else
+            {
+                reiniciar = false; // la simulación seguirá desde la posición guardada
+                MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos. Abre Simulación para continuar.");
             }
         }
     }

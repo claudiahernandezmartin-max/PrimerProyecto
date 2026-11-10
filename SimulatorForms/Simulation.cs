@@ -8,15 +8,13 @@ namespace SimulatorForms
 {
     public partial class Simulation : Form
     {
-        FlightPlanList lista;          // ← en vez de plan1 y plan2: sirve para 2 o más vuelos
+        FlightPlanList lista;          // en vez de plan1 y plan2: sirve para 2 o más vuelos
         double distanciaSeguridad;
         double tiempoCiclo;
 
         List<PictureBox> aviones = new List<PictureBox>();   // un PictureBox por vuelo
-        int tamanoAvion = 32;                                // lado en píxeles de cada PictureBox
-
-        bool alarmaActivada = false;
-        bool cargandoTabla = false;    // ← NUEVO: se usa en el punto 18 (tabla de velocidades)
+        int tamanoAvion = 32;   // lado en píxeles de cada PictureBox
+        Estilo estilo = new Estilo();   // colores y dibujos de la simulación
 
         public Simulation(FlightPlanList lista, double distanciaSeguridad, double tiempoCiclo)
         {
@@ -54,12 +52,12 @@ namespace SimulatorForms
                 FlightPlan plan = lista.GetFlightPlan(i);
 
                 // Colores alternos de la clase Estilo
-                Color color = Estilo.ColoresAvion[i % Estilo.ColoresAvion.Length];
+                Color color = estilo.GetColorAvion(i);
 
                 // Trayectoria (línea a rayas)
                 Position inicio = plan.GetInitialPosition();
                 Position final = plan.GetFinalPosition();
-                g.DrawLine(Estilo.LapizTrayectoria(color),
+                g.DrawLine(estilo.LapizTrayectoria(color),
                     (float)inicio.GetX(), (float)inicio.GetY(),
                     (float)final.GetX(), (float)final.GetY());
 
@@ -73,26 +71,23 @@ namespace SimulatorForms
                 {
                     colorElipse = Color.Red;
                 }
-                g.FillEllipse(Estilo.PincelSuave(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
-                g.DrawEllipse(Estilo.LapizElipse(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
+                g.FillEllipse(estilo.PincelSuave(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
+                g.DrawEllipse(estilo.LapizElipse(colorElipse), x - radio, y - radio, radio * 2, radio * 2);
 
                 // Identificador al lado del avión
-                g.DrawString(plan.GetId(), Estilo.FuenteNormal, new SolidBrush(color), x + 12, y + 8);
+                g.DrawString(plan.GetId(), estilo.GetFuenteNormal(), new SolidBrush(color), x + 12, y + 8);
 
                 i++;
             }
         }
 
+        // Botón Mover: avanza un ciclo todos los vuelos que no han llegado
         private void button1_Click(object sender, EventArgs e)
         {
-            // Mueve todos los vuelos que no han llegado (punto 6)
             lista.Mover(tiempoCiclo);
             ColocarAviones();
-            panelSimulacion.Invalidate();
-
-            // Después de mover, comprobamos si hay conflicto
+            panelSimulacion.Invalidate();   // al repintar, las elipses en conflicto salen en rojo
             ActualizarEstado();
-            ComprobarAlarma();   // ← NUEVO: ahora también salta la alarma en modo paso a paso
 
             if (lista.TodosHanLlegado())
             {
@@ -115,7 +110,7 @@ namespace SimulatorForms
 
             if (lista.HayConflicto(distanciaSeguridad))
             {
-                labelEstado.Text = "¡CONFLICTO! Hay vuelos a menos de la distancia de seguridad";
+                labelEstado.Text = "CONFLICTO Hay vuelos a menos de la distancia de seguridad";
                 labelEstado.ForeColor = Color.Red;
             }
             else if (lista.BuscarConflictoFuturo(distanciaSeguridad))
@@ -132,22 +127,6 @@ namespace SimulatorForms
                 labelEstado.ForeColor = Color.Green;
             }
         }
-        private void ComprobarAlarma()
-        {
-            if (lista.HayConflicto(distanciaSeguridad))
-            {
-                if (!alarmaActivada)
-                {
-                    alarmaActivada = true;
-                    MessageBox.Show("¡Alarma! Hay vuelos a una distancia inferior a la de seguridad.",
-                        "Pérdida de separación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            else
-            {
-                alarmaActivada = false;
-            }
-        }
         // Crea un PictureBox por cada vuelo con la silueta del avión girada hacia su destino
         private void CrearAviones()
         {
@@ -155,7 +134,7 @@ namespace SimulatorForms
             while (i < lista.GetNumber())
             {
                 FlightPlan plan = lista.GetFlightPlan(i);
-                Color color = Estilo.ColoresAvion[i % Estilo.ColoresAvion.Length];
+                Color color = estilo.GetColorAvion(i);
 
                 Position inicio = plan.GetInitialPosition();
                 Position final = plan.GetFinalPosition();
@@ -165,7 +144,7 @@ namespace SimulatorForms
                 Bitmap dibujo = new Bitmap(tamanoAvion, tamanoAvion);
                 Graphics g = Graphics.FromImage(dibujo);
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                Estilo.DibujarAvion(g, tamanoAvion / 2f, tamanoAvion / 2f, 0.12f, angulo, color);
+                estilo.DibujarAvion(g, tamanoAvion / 2f, tamanoAvion / 2f, 0.12f, angulo, color);
                 g.Dispose();
 
                 PictureBox avion = new PictureBox();
@@ -236,26 +215,34 @@ namespace SimulatorForms
             buttonDetener.Enabled = true;
             buttonMover.Enabled = false;
         }
+        // Calcula con la derivada nuevas velocidades, las enseña y pregunta si se aplican
         private void ProponerCambiosVelocidad()
         {
             double[] antes = lista.GetVelocidades();
-
-            if (lista.ResolverConflictos(distanciaSeguridad) == false)
-            {
-                MessageBox.Show("No se ha podido resolver el conflicto cambiando las velocidades.");
-                return;
-            }
-
+            int sinResolver = lista.ResolverConflictos(distanciaSeguridad);
             double[] despues = lista.GetVelocidades();
-            string texto = "Cambios de velocidad propuestos:\n\n";
-            int i = 0;
-            while (i < despues.Length)
+
+            // Escribimos solo los vuelos que cambian de velocidad
+            string texto = "";
+            for (int i = 0; i < despues.Length; i++)
             {
                 if (despues[i] != antes[i])
                 {
                     texto = texto + string.Format("{0}: {1:F2} -> {2:F2}\n", lista.GetFlightPlan(i).GetId(), antes[i], despues[i]);
                 }
-                i++;
+            }
+
+            if (texto == "")
+            {
+                MessageBox.Show("No se ha podido resolver ningún conflicto cambiando las velocidades.");
+                return;
+            }
+
+            texto = "Cambios de velocidad propuestos:\n\n" + texto;
+            if (sinResolver > 0)
+            {
+                texto = texto + "\nQuedan " + sinResolver + " conflictos sin solución (los aviones ya están demasiado cerca " +
+                    "o haría falta una velocidad no permitida).\n";
             }
             texto = texto + "\n¿Aplicar estos cambios?";
 
@@ -278,26 +265,17 @@ namespace SimulatorForms
         }
         private void timerSimulacion_Tick(object sender, EventArgs e)
         {
-            // Mueve todos los vuelos que no han llegado
             lista.Mover(tiempoCiclo);
             ColocarAviones();
-            panelSimulacion.Invalidate();
+            panelSimulacion.Invalidate();   // al repintar, las elipses en conflicto salen en rojo
             ActualizarEstado();
 
-            // Si ya han llegado todos, paramos el timer ANTES de la alarma
-            bool fin = lista.TodosHanLlegado();
-            if (fin)
+            if (lista.TodosHanLlegado())
             {
                 timerSimulacion.Stop();
                 buttonIniciar.Enabled = true;
                 buttonDetener.Enabled = false;
                 buttonMover.Enabled = true;
-            }
-
-            ComprobarAlarma();   // ← aquí va la llamada, en lugar del bloc FASE 10
-
-            if (fin)
-            {
                 MessageBox.Show("Todos los vuelos han llegado a su destino.");
             }
         }
@@ -338,7 +316,6 @@ namespace SimulatorForms
             timerSimulacion.Stop();
             lista.Restart();            // ← en vez de plan1.Restart(); plan2.Restart();
             ColocarAviones();
-            alarmaActivada = false;
 
             buttonIniciar.Enabled = true;
             buttonDetener.Enabled = false;
@@ -350,7 +327,6 @@ namespace SimulatorForms
 
         private void CargarTablaVelocidades()
         {
-            cargandoTabla = true;
             dataGridViewVelocidades.Rows.Clear();
             int i = 0;
             while (i < lista.GetNumber())
@@ -359,7 +335,6 @@ namespace SimulatorForms
                 dataGridViewVelocidades.Rows.Add(plan.GetId(), plan.GetVelocidad().ToString("F2"));
                 i++;
             }
-            cargandoTabla = false;
         }
         private void buttonVelocidadesOriginales_Click(object sender, EventArgs e)
         {
@@ -368,30 +343,31 @@ namespace SimulatorForms
             Restart_Click(null, null);
 
         }
+        // Cuando el usuario cambia una velocidad en la tabla: la aplica y reinicia la simulación
         private void dataGridViewVelocidades_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (cargandoTabla || e.RowIndex < 0 || e.RowIndex >= lista.GetNumber() || e.ColumnIndex != 1)
+            if (e.RowIndex < 0 || e.RowIndex >= lista.GetNumber() || e.ColumnIndex != 1)
             {
                 return;
             }
 
             FlightPlan plan = lista.GetFlightPlan(e.RowIndex);
-            object valor = dataGridViewVelocidades.Rows[e.RowIndex].Cells[1].Value;
+            DataGridViewCell celda = dataGridViewVelocidades.Rows[e.RowIndex].Cells[1];
             bool valida = true;
 
             try
             {
-                plan.SetVelocidad(Convert.ToDouble(valor));   // si es <= 0 lanza excepción
+                double nueva = Convert.ToDouble(celda.Value);
+                if (plan.SetVelocidad(nueva) == false)
+                {
+                    valida = false;
+                    MessageBox.Show("La velocidad tiene que ser mayor que 0 y como máximo " + plan.GetVelocidadMaxima() + ".");
+                }
             }
             catch (FormatException)
             {
                 valida = false;
                 MessageBox.Show("La velocidad tiene que ser un número.");
-            }
-            catch (ArgumentException)
-            {
-                valida = false;
-                MessageBox.Show("La velocidad tiene que ser mayor que 0.");
             }
             catch (OverflowException)
             {
@@ -399,32 +375,47 @@ namespace SimulatorForms
                 MessageBox.Show("La velocidad es demasiado grande.");
             }
 
-            // Esperamos a que la tabla acabe de editar, la recargamos y, solo si era válida, reiniciamos
-            BeginInvoke(new Action(delegate ()
+            // En la celda se queda la velocidad que tiene el vuelo (la nueva o, si era mala, la de antes)
+            celda.Value = plan.GetVelocidad().ToString("F2");
+
+            if (valida == true)
             {
-                CargarTablaVelocidades();
-                if (valida)
-                {
-                    Restart_Click(null, null);
-                }
-            }));
+                Restart_Click(null, null);   // los aviones vuelven al principio con la velocidad nueva
+            }
         }
         private void label2_Click(object sender, EventArgs e)
         {
 
         }
 
-        // Guarda los vuelos, con su posición actual, en el fichero que elija el usuario
+        // Guarda los vuelos, con su posición actual, en el fichero "vuelos_guardados.txt"
         private void buttonGuardar_Click(object sender, EventArgs e)
         {
-            buttonDetener_Click(null, null); // paramos para guardar las posiciones de este momento
+            timerSimulacion.Stop();   // paramos para guardar las posiciones de este momento
+            buttonIniciar.Enabled = true;
+            buttonDetener.Enabled = false;
+            buttonMover.Enabled = true;
 
-            SaveFileDialog dialogo = new SaveFileDialog();
-            if (dialogo.ShowDialog() == DialogResult.OK)
+            lista.GuardarFichero("vuelos_guardados.txt");
+            MessageBox.Show("Vuelos guardados. Para seguir otro día: Menú → Continuar simulación guardada.");
+        }
+
+        private void buttonDeshacer_Click(object sender, EventArgs e)
+        {
+            timerSimulacion.Stop();   // si iba en automático, primero paramos
+            buttonIniciar.Enabled = true;
+            buttonDetener.Enabled = false;
+            buttonMover.Enabled = true;
+
+            if (lista.Deshacer() == false)
             {
-                lista.GuardarFichero(dialogo.FileName);
-                MessageBox.Show("Vuelos guardados.");
+                MessageBox.Show("No hay ningún paso que deshacer.");
+                return;
             }
+
+            ColocarAviones();
+            panelSimulacion.Invalidate();
+            ActualizarEstado();
         }
     }
 }

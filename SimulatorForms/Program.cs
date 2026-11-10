@@ -16,7 +16,7 @@ namespace SimulatorForms
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            LoginForm login = new LoginForm();   // Crea la ventana de login
+            Login login = new Login();   // Crea la ventana de login
             login.ShowDialog();                  // La muestra y espera a que se cierre
 
             if (login.GetAceptado())             // Esta bien?

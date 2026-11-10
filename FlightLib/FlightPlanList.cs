@@ -9,6 +9,8 @@ namespace FlightLib
 {
     public class FlightPlanList
     {
+        // Para deshacer: antes de cada paso guardamos dónde estaba cada avión.
+        Stack<List<Position>> historial = new Stack<List<Position>>();
         List<FlightPlan> vuelos = new List<FlightPlan>(); // antes era un vector de 10
 
         // Añade un vuelo al final de la lista
@@ -29,6 +31,7 @@ namespace FlightLib
         public void Vaciar()
         {
             vuelos.Clear();
+            historial.Clear();
         }
 
         // Carga los vuelos del fichero (id xi yi xf yf velocidad y, si se guardó a mitad, xa ya)
@@ -65,6 +68,13 @@ namespace FlightLib
                         double velocidad = Convert.ToDouble(trozos[5]);
                         FlightPlan plan = new FlightPlan(id, xi, yi, xf, yf, velocidad);
 
+                        // Velocidad no permitida (<= 0 o mayor que la máxima)
+                        if (plan.VelocidadValida(velocidad) == false)
+                        {
+                            F.Close();
+                            return -3;
+                        }
+
                         // El vuelo sigue desde donde estaba cuando se guardó
                         if (trozos.Length == 8)
                         {
@@ -80,6 +90,7 @@ namespace FlightLib
                 F.Close();
 
                 vuelos = nuevos;
+                historial.Clear();
                 return 0;
             }
             catch (FileNotFoundException)
@@ -90,11 +101,6 @@ namespace FlightLib
             {
                 F.Close();
                 return -2;
-            }
-            catch (ArgumentException) // velocidad <= 0
-            {
-                F.Close();
-                return -3;
             }
         }
 
@@ -113,18 +119,46 @@ namespace FlightLib
             W.Close();
         }
 
+        // Mueve un ciclo todos los vuelos que no han llegado, pero antes de mover guarda las posiciones en el historial para poder deshacer
         public void Mover(double tiempo)
         {
-            int i = 0;
-            while (i < vuelos.Count)
+            if (TodosHanLlegado())
+            {
+                return; // no hay nada que mover ni que guardar
+            }
+
+            // Guardamos dónde está cada avión ahora
+            List<Position> posiciones = new List<Position>();
+            for (int i = 0; i < vuelos.Count; i++)
+            {
+                posiciones.Add(vuelos[i].GetCurrentPosition());
+            }
+            historial.Push(posiciones);
+
+            // Movemos los que no han llegado
+            for (int i = 0; i < vuelos.Count; i++)
             {
                 if (vuelos[i].HasArrived() == false)
                 {
                     vuelos[i].Move(tiempo);
                 }
-                i++;
+            }
+        }
+
+        // Deshace el último paso: vuelve a poner cada avión donde estaba antes de moverse
+        public bool Deshacer()
+        {
+            if (historial.Count == 0)
+            {
+                return false;
             }
 
+            List<Position> posiciones = historial.Pop();
+            for (int i = 0; i < vuelos.Count; i++)
+            {
+                vuelos[i].SetCurrentPosition(posiciones[i]);
+            }
+            return true;
         }
         public int GetNumber()
         {
@@ -141,15 +175,23 @@ namespace FlightLib
             return true;
         }
 
+        // Vuelve a poner todos los vuelos en su posición inicial y borra el historial
         public void Restart()
         {
             for (int i = 0; i < vuelos.Count; i++)
+            {
                 vuelos[i].Restart();
+            }
+            historial.Clear();
         }
+
+        // Vuelve a poner a cada vuelo la velocidad con la que se creó
         public void RestaurarVelocidadesIniciales()
         {
             for (int i = 0; i < vuelos.Count; i++)
+            {
                 vuelos[i].RestaurarVelocidadInicial();
+            }
         }
 
         public double[] GetVelocidades()
@@ -235,54 +277,116 @@ namespace FlightLib
             return conflictoTiempo;
         }
 
-        public bool HabraConflicto(double D)
+        // Cuenta cuántas parejas de vuelos entrarán en conflicto
+        public int ContarConflictosFuturos(double D)
         {
-            return BuscarConflictoFuturo(D);
+            int n = 0;
+            for (int i = 0; i < vuelos.Count; i++)
+            {
+                for (int j = i + 1; j < vuelos.Count; j++)
+                {
+                    if (vuelos[i].HabraConflicto(vuelos[j], D))
+                    {
+                        n++;
+                    }
+                }
+            }
+            return n;
         }
 
-        // Propone velocidades: frena un vuelo de la pareja (99%..10%) hasta que no haya conflictos
-        public bool ResolverConflictos(double D)
+        // Cuenta con cuántos vuelos entrará en conflicto el vuelo f,
+        // mirando solo los vuelos de la posición 0 hasta "hasta" (sin incluirlo)
+        private int ConflictosDe(int f, double D, int hasta)
         {
-            double[] orig = GetVelocidades();
-            int intentos = 0;
-
-            while (BuscarConflictoFuturo(D) == true && intentos < 100)
+            int n = 0;
+            for (int j = 0; j < hasta; j++)
             {
-                int a = conflictoA;
-                int b = conflictoB;
-
-                bool frenado = Frenar(b, a, D);
-                if (frenado == false)
+                if (j != f && vuelos[f].HabraConflicto(vuelos[j], D))
                 {
-                    frenado = Frenar(a, b, D);
+                    n++;
                 }
-                if (frenado == false)
-                {
-                    SetVelocidades(orig);
-                    return false;
-                }
-                intentos++;
             }
-
-            if (HabraConflicto(D) == true)
-            {
-                SetVelocidades(orig);
-                return false;
-            }
-            return true;
+            return n;
         }
 
-        private bool Frenar(int f, int o, double D)
+        // Busca con la derivada una velocidad para el vuelo f que le quite conflictos
+        private bool MejorarVuelo(int f, double D, int hasta)
         {
-            double v0 = vuelos[f].GetVelocidad();
-            for (int p = 99; p >= 10; p--)
+            double original = vuelos[f].GetVelocidad();
+            int mejorConflictos = ConflictosDe(f, D, hasta);
+            double mejorVelocidad = -1;
+
+            for (int j = 0; j < vuelos.Count; j++)
             {
-                vuelos[f].SetVelocidad(v0 * p / 100.0);
-                if (!vuelos[f].HabraConflicto(vuelos[o], D))
-                    return true;
+                if (j != f)
+                {
+                    List<double> candidatas = vuelos[f].VelocidadesSinConflicto(vuelos[j], D);
+                    for (int k = 0; k < candidatas.Count; k++)
+                    {
+                        vuelos[f].SetVelocidad(candidatas[k]);  // probamos esta velocidad
+                        int n = ConflictosDe(f, D, hasta);
+                        vuelos[f].SetVelocidad(original);       // y dejamos la que había
+
+                        bool menosConflictos = n < mejorConflictos;
+                        bool cambiaMenos = n == mejorConflictos && mejorVelocidad > 0
+                            && Math.Abs(candidatas[k] - original) < Math.Abs(mejorVelocidad - original);
+
+                        if (menosConflictos || cambiaMenos)
+                        {
+                            mejorConflictos = n;
+                            mejorVelocidad = candidatas[k];
+                        }
+                    }
+                }
             }
-            vuelos[f].SetVelocidad(v0);
+
+            if (mejorVelocidad > 0)
+            {
+                vuelos[f].SetVelocidad(mejorVelocidad);
+                return true;
+            }
             return false;
+        }
+
+        // Propone velocidades para quitar todos los conflictos que se puedan
+        public int ResolverConflictos(double D)
+        {
+            // Paso 1: en orden
+            for (int k = 1; k < vuelos.Count; k++)
+            {
+                if (ConflictosDe(k, D, k) > 0)
+                {
+                    MejorarVuelo(k, D, k);
+                }
+            }
+
+            // Paso 2: repasar lo que quede, mientras se consiga arreglar algo
+            bool hayCambios = true;
+            int pasada = 0;
+            while (hayCambios == true && pasada < 10)
+            {
+                hayCambios = false;
+                for (int i = 0; i < vuelos.Count; i++)
+                {
+                    for (int j = i + 1; j < vuelos.Count; j++)
+                    {
+                        if (vuelos[i].HabraConflicto(vuelos[j], D))
+                        {
+                            // Primero probamos con el segundo vuelo y, si no, con el primero
+                            if (MejorarVuelo(j, D, vuelos.Count) == true)
+                            {
+                                hayCambios = true;
+                            }
+                            else if (MejorarVuelo(i, D, vuelos.Count) == true)
+                            {
+                                hayCambios = true;
+                            }
+                        }
+                    }
+                }
+                pasada++;
+            }
+            return ContarConflictosFuturos(D);
         }
 
         // Distancia actual entre la pareja de vuelos más cercana

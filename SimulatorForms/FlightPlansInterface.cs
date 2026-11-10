@@ -64,11 +64,7 @@ namespace SimulatorForms
                 double yf2 = Convert.ToDouble(FP2_yf.Text);
 
                 // Comprobaciones ANTES de crear los vuelos
-                if (vel1 <= 0 || vel2 <= 0)
-                {
-                    MessageBox.Show("La velocidad tiene que ser mayor que 0.");
-                    return;
-                }
+                
                 if (id1 == "" || id2 == "")
                 {
                     MessageBox.Show("Los dos vuelos necesitan un identificador.");
@@ -83,6 +79,13 @@ namespace SimulatorForms
                 // Ahora sí, creamos los vuelos
                 FlightPlan plan1 = new FlightPlan(id1, xi1, yi1, xf1, yf1, vel1);
                 FlightPlan plan2 = new FlightPlan(id2, xi2, yi2, xf2, yf2, vel2);
+
+                // Comprobamos que las velocidades están permitidas
+                if (plan1.VelocidadValida(vel1) == false || plan2.VelocidadValida(vel2) == false)
+                {
+                    MessageBox.Show("La velocidad tiene que ser mayor que 0 y como máximo " + plan1.GetVelocidadMaxima());
+                    return;
+                }
 
                 // Quitamos los vuelos anteriores para que no se acumulen
                 lista.Vaciar();
@@ -99,10 +102,6 @@ namespace SimulatorForms
             catch (OverflowException)
             {
                 MessageBox.Show("Alguno de los números es demasiado grande.");
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show(ex.Message);
             }
         }
 
