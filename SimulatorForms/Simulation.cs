@@ -409,10 +409,22 @@ namespace SimulatorForms
                 }
             }));
         }
-
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        // Guarda los vuelos, con su posición actual, en el fichero que elija el usuario
+        private void buttonGuardar_Click(object sender, EventArgs e)
+        {
+            buttonDetener_Click(null, null); // paramos para guardar las posiciones de este momento
+
+            SaveFileDialog dialogo = new SaveFileDialog();
+            if (dialogo.ShowDialog() == DialogResult.OK)
+            {
+                lista.GuardarFichero(dialogo.FileName);
+                MessageBox.Show("Vuelos guardados.");
+            }
         }
     }
 }

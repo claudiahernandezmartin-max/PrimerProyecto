@@ -31,8 +31,8 @@ namespace FlightLib
             vuelos.Clear();
         }
 
-        // Carga los vuelos del fichero (una línea por vuelo: id xi yi xf yf velocidad)
-        // Devuelve 0 si va bien, -1 si el fichero no existe y -2 si hay datos mal escritos
+        // Carga los vuelos del fichero (id xi yi xf yf velocidad y, si se guardó a mitad, xa ya)
+        // Devuelve 0 si va bien, -1 si no existe, -2 si hay datos mal escritos y -3 si hay una velocidad <= 0
         public int CargarFichero(string nombreFichero)
         {
             StreamReader F = null;
@@ -46,15 +46,35 @@ namespace FlightLib
                 string linea = F.ReadLine();
                 while (linea != null)
                 {
-                    string[] trozos = linea.Split(' ');
-                    string id = trozos[0];
-                    double xi = Convert.ToDouble(trozos[1]);
-                    double yi = Convert.ToDouble(trozos[2]);
-                    double xf = Convert.ToDouble(trozos[3]);
-                    double yf = Convert.ToDouble(trozos[4]);
-                    double velocidad = Convert.ToDouble(trozos[5]);
+                    if (linea != "") // las líneas vacías se saltan
+                    {
+                        string[] trozos = linea.Split(' ');
 
-                    nuevos.Add(new FlightPlan(id, xi, yi, xf, yf, velocidad));
+                        // 6 datos si es un fichero normal, 8 si se guardó con la posición actual
+                        if (trozos.Length != 6 && trozos.Length != 8)
+                        {
+                            F.Close();
+                            return -2;
+                        }
+
+                        string id = trozos[0];
+                        double xi = Convert.ToDouble(trozos[1]);
+                        double yi = Convert.ToDouble(trozos[2]);
+                        double xf = Convert.ToDouble(trozos[3]);
+                        double yf = Convert.ToDouble(trozos[4]);
+                        double velocidad = Convert.ToDouble(trozos[5]);
+                        FlightPlan plan = new FlightPlan(id, xi, yi, xf, yf, velocidad);
+
+                        // El vuelo sigue desde donde estaba cuando se guardó
+                        if (trozos.Length == 8)
+                        {
+                            double xa = Convert.ToDouble(trozos[6]);
+                            double ya = Convert.ToDouble(trozos[7]);
+                            plan.SetCurrentPosition(new Position(xa, ya));
+                        }
+
+                        nuevos.Add(plan);
+                    }
                     linea = F.ReadLine();
                 }
                 F.Close();
@@ -71,6 +91,26 @@ namespace FlightLib
                 F.Close();
                 return -2;
             }
+            catch (ArgumentException) // velocidad <= 0
+            {
+                F.Close();
+                return -3;
+            }
+        }
+
+        // Guarda los vuelos en el fichero con su posición actual (id xi yi xf yf velocidad xa ya)
+        public void GuardarFichero(string nombreFichero)
+        {
+            StreamWriter W = new StreamWriter(nombreFichero);
+            for (int i = 0; i < vuelos.Count; i++)
+            {
+                FlightPlan p = vuelos[i];
+                string linea = p.GetId() + " " + p.GetInitialPosition().GetX() + " " + p.GetInitialPosition().GetY()
+                    + " " + p.GetFinalPosition().GetX() + " " + p.GetFinalPosition().GetY() + " " + p.GetVelocidad()
+                    + " " + p.GetCurrentPosition().GetX() + " " + p.GetCurrentPosition().GetY();
+                W.WriteLine(linea);
+            }
+            W.Close();
         }
 
         public void Mover(double tiempo)

@@ -18,6 +18,7 @@ namespace SimulatorForms
         // FASE 2.3: valores por defecto si el usuario no los cambia
         double distanciaSeguridad = 15;
         double tiempoCiclo = 2;
+        bool reiniciar = true; // false justo después de cargar un fichero, para seguir desde donde se guardó
 
         public Menu()
         {
@@ -41,8 +42,12 @@ namespace SimulatorForms
                 return;
             }
 
-            // Cada vez que se abre la simulación, los vuelos empiezan desde su posición inicial
-            lista.Restart();
+            // Los vuelos empiezan desde su posición inicial, menos si se acaba de cargar un fichero
+            if (reiniciar)
+            {
+                lista.Restart();
+            }
+            reiniciar = true;
 
             // Ahora se pasa la lista entera en vez de plan1 y plan2
             Simulation f = new Simulation(lista, distanciaSeguridad, tiempoCiclo);
@@ -77,7 +82,11 @@ namespace SimulatorForms
                 }
                 else if (resultado == -2)
                 {
-                    MessageBox.Show("Hay datos mal escritos en el fichero.");
+                    MessageBox.Show("Hay datos mal escritos o que faltan en el fichero.");
+                }
+                else if (resultado == -3)
+                {
+                    MessageBox.Show("Alguna velocidad del fichero no es mayor que 0.");
                 }
                 else if (lista.GetNumber() == 0)
                 {
@@ -85,6 +94,7 @@ namespace SimulatorForms
                 }
                 else
                 {
+                    reiniciar = false; // la simulación seguirá desde la posición guardada
                     MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos.");
                 }
             }
