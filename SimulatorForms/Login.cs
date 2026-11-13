@@ -13,7 +13,7 @@ namespace SimulatorForms
 {
     public partial class Login : Form
     {
-        GestiónUsuarios gestor = new GestiónUsuarios("usuarios.db");
+        GestionUsuarios gestor = new GestionUsuarios("usuarios.db");
         bool aceptado = false;
         Estilo estilo = new Estilo();
         public Login()
@@ -61,6 +61,7 @@ namespace SimulatorForms
                 Close();
             }
         }
+
         // Botón Entrar: comprueba el usuario y la contraseña en la base de datos
         private void buttonEntrar_Click(object sender, EventArgs e)
         {

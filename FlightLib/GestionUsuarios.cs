@@ -8,24 +8,25 @@ using System.Data.SQLite;
 
 namespace FlightLib
 {
-    public class GestiónUsuarios
+    public class GestionUsuarios
     {
-        string usuarios;
-        public GestiónUsuarios(string usuarios)
+        string fichero; // ruta del fichero de la base de datos
+        public GestionUsuarios(string usuarios)
         {
-            this.usuarios = usuarios;
+            this.fichero = usuarios;
         }
-        //Abrir connexión con la base de datos
+
+        //Abrir connexión con la base de datos y devuelve la conexión abierta
         private SQLiteConnection Conectar()
         {
-            SQLiteConnection conexion = new SQLiteConnection("Data Source=" + usuarios + ";Version=3;");
+            SQLiteConnection conexion = new SQLiteConnection("Data Source=" + fichero + ";Version=3;");
             conexion.Open();
             return conexion;
         }
         public int Comprobar()
         {
             // SQLite crea un fichero vacío si no existe, por eso lo miramos antes
-            if (!File.Exists(usuarios))
+            if (!File.Exists(fichero))
             {
                 //No existe el fichero de usuarios
                 return -1;
@@ -36,7 +37,7 @@ namespace FlightLib
             try
             {
                 conexión = Conectar();
-                //Selecciona, cuenta y lo hace desde la tabla de usuarios. 
+                //Selecciona, cuenta y lo hace desde la tabla de usuarios del fichero
                 SQLiteCommand consulta = new SQLiteCommand("SELECT COUNT(*) FROM usuarios", conexión);
                 consulta.ExecuteScalar();
                 resultado = 0;
@@ -57,17 +58,17 @@ namespace FlightLib
         // Devuelve 1 si son correctos, 0 si no, -1 si no existe la base de datos, -2 si hay un error
         public int Login(string usuario, string password)
         {
-            if (!File.Exists(usuarios))
+            if (File.Exists(fichero) == false)
             {
                 return -1;
             }
 
             int resultado;
-            SQLiteConnection conexión = null;
+            SQLiteConnection conexion = null;
             try
             {
-                conexión = Conectar();
-                SQLiteCommand consulta = new SQLiteCommand("SELECT COUNT(*) FROM usuarios WHERE nombre = @nombre AND password = @password", conexión);
+                conexion = Conectar();
+                SQLiteCommand consulta = new SQLiteCommand("SELECT COUNT(*) FROM usuarios WHERE nombre = @nombre AND password = @password", conexion);
                 consulta.Parameters.AddWithValue("@nombre", usuario);
                 consulta.Parameters.AddWithValue("@password", password);
 
@@ -84,9 +85,9 @@ namespace FlightLib
             {
                 resultado = -2;
             }
-            if (conexión != null)
+            if (conexion != null)
             {
-                conexión.Close();
+                conexion.Close();
             }
             return resultado;
         }
@@ -95,19 +96,19 @@ namespace FlightLib
         // Devuelve 0 si se ha registrado, 1 si el usuario ya existe, -1 si no existe la base de datos, -2 si hay un error
         public int Registrar(string usuario, string password)
         {
-            if (!File.Exists(usuarios))
+            if (File.Exists(fichero) == false)
             {
                 return -1;
             }
 
             int resultado;
-            SQLiteConnection conexión = null;
+            SQLiteConnection conexion = null;
             try
             {
-                conexión = Conectar();
+                conexion = Conectar();
 
                 // Miramos si ya existe alguien con ese nombre
-                SQLiteCommand buscar = new SQLiteCommand("SELECT COUNT(*) FROM usuarios WHERE nombre = @nombre", conexión);
+                SQLiteCommand buscar = new SQLiteCommand("SELECT COUNT(*) FROM usuarios WHERE nombre = @nombre", conexion);
                 buscar.Parameters.AddWithValue("@nombre", usuario);
 
                 if (Convert.ToInt32(buscar.ExecuteScalar()) > 0)
@@ -116,7 +117,7 @@ namespace FlightLib
                 }
                 else
                 {
-                    SQLiteCommand insertar = new SQLiteCommand("INSERT INTO usuarios (nombre, password) VALUES (@nombre, @password)", conexión);
+                    SQLiteCommand insertar = new SQLiteCommand("INSERT INTO usuarios (nombre, password) VALUES (@nombre, @password)", conexion);
                     insertar.Parameters.AddWithValue("@nombre", usuario);
                     insertar.Parameters.AddWithValue("@password", password);
                     insertar.ExecuteNonQuery();
@@ -127,9 +128,9 @@ namespace FlightLib
             {
                 resultado = -2;
             }
-            if (conexión != null)
+            if (conexion != null)
             {
-                conexión.Close();
+                conexion.Close();
             }
             return resultado;
         }

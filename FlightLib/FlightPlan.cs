@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//Métode sempre s'ha de tenir en compte  a quina classe s'afegeix
+
 namespace FlightLib
 {
+    // Plan de vuelo de un avión: identificador, posiciones y velocidad
     public class FlightPlan
     {
-        // Atributos
-
         string id; // identificador
-        Position currentPosition; // posicion actual
-        Position finalPosition; // posicion final
-        Position initialPosition; // posicion inicial
+        Position currentPosition;
+        Position finalPosition;
+        Position initialPosition;
         double velocidad;
         double velocidadInicial; // para el Reset
         double velocidadMaxima = 600; // ningún avión puede ir más rápido que esto
@@ -23,14 +22,9 @@ namespace FlightLib
         double minimoDistancia;
         double minimoTiempo;
 
-        // Constructures
+        // Constructor. Recibe el identificador, la posición inicial (cpx, cpy), la posición final (fpx, fpy) y la velocidad. La velocidad tiene que ser mayor que 0
         public FlightPlan(string id, double cpx, double cpy, double fpx, double fpy, double velocidad)
         {
-            // Velocidades negativas NO
-            if (velocidad <= 0)
-            {
-                throw new ArgumentException("La velocidad tiene que ser mayor que 0.");
-            }
             this.id = id;
             this.currentPosition = new Position(cpx, cpy);
             this.finalPosition = new Position(fpx, fpy);
@@ -51,15 +45,13 @@ namespace FlightLib
             return velocidadMaxima;
         }
 
-        // Gets i Sets
-
-        // getter de atribut velocidad
+        // getter de atributo velocidad
         public double GetVelocidad()
         {
             return velocidad;
         }
 
-        // setter de atribut velocidad
+        // setter de atributo velocidad
         // Solo cambia la velocidad si es válida. Devuelve true si la ha cambiado y false si no
         public bool SetVelocidad(double velocidad)
         {
@@ -71,55 +63,65 @@ namespace FlightLib
             return true;
         }
 
-        // getter de atribut id
+        // Devuelve la velocidad con la que se creó el vuelo
+        public double GetVelocidadInicial()
+        {
+            return velocidadInicial;
+        }
+
+        // Vuelve a poner la velocidad con la que se creó el vuelo
+        public void RestaurarVelocidadInicial()
+        {
+            velocidad = velocidadInicial;
+        }
+
+        // getter de atributo id
         public string GetId()
         {
             return id;
         }
 
-        // setter de atribut id
+        // setter de atributo id
         public void SetId(string id)
         {
             this.id = id;
         }
 
-        // Getter de atribut CurrentPosition
+        // Getter de atributo CurrentPosition
         public Position GetCurrentPosition()
         {
             return currentPosition;
         }
        
-        // setter de atribut CurrentPosition
+        // setter de atributo CurrentPosition
         public void SetCurrentPosition(Position currentPosition)
         {
             this.currentPosition = currentPosition;
         }
 
-        // Getter de atribut FinalPosition
+        // Getter de atributo FinalPosition
         public Position GetFinalPosition()
         {
             return finalPosition;
         }
 
-        // Setter de atribut FinalPosition
+        // Setter de atributo FinalPosition
         public void SetFinalPosition(Position finalPosition)
         {
             this.finalPosition = finalPosition;
         }
 
-        // Getter de atribut InitialPosition
+        // Getter de atributo InitialPosition
         public Position GetInitialPosition()
         {
             return initialPosition;
         }
 
-        // Setter de atribut InitialPosition
+        // Setter de atributo InitialPosition
         public void SetInitialPosition(Position initialPosition)
         {
             this.initialPosition = initialPosition;
         }
-
-        // Funcions
 
         public void Move(double tiempo)
         // Mueve el vuelo a la posición correspondiente a viajar durante el tiempo que se recibe como parámetro
@@ -166,14 +168,7 @@ namespace FlightLib
         {
             currentPosition = initialPosition;
         }
-        public void RestaurarVelocidadInicial() 
-        { 
-            velocidad = velocidadInicial; 
-        }
-        public double GetVelocidadInicial() 
-        { 
-            return velocidadInicial; 
-        }
+
         public string GetCompania()
         {
             // Partimos el identificador por los números: la primera parte son las letras
@@ -211,7 +206,7 @@ namespace FlightLib
             }
             return compania;
         }
-        //Fer métode que detecti quan hi ha dos vols que estan més aprop de la distància de seguretat 
+        // Dice si ahora mismo este vuelo y el vuelo b están a menos de la distancia de seguridad
         public bool Conflicto(FlightPlan b, double distanciaSeguridad)
         {  
             bool conflicto = false;
@@ -221,11 +216,13 @@ namespace FlightLib
             return conflicto;
         }
 
+        // Devuelve el tiempo (en minutos) que le falta para llegar al destino
         public double TiempoHastaLlegada()
         { 
             return currentPosition.Distancia(finalPosition) / (velocidad / 60); 
         }
 
+        // Devuelve la componente X de la velocidad (por minuto). Es 0 si ya ha llegado
         public double GetVelocidadX()
         {
             double hipotenusa = currentPosition.Distancia(finalPosition);
@@ -262,6 +259,7 @@ namespace FlightLib
             }
             return resultado;
         }
+
         // Instante entre inicio y fin en el que este avión y b están más cerca y se calcula con la derivada de la distancia al cuadrado igualada a 0
         private double MinimoEnTramo(FlightPlan b, double inicio, double fin)
         {
@@ -345,13 +343,14 @@ namespace FlightLib
             CalcularMinimo(b);
             return minimoDistancia;
         }
-        // Dice si, siguiendo como van, los dos aviones entrarán en conflicto
+
+        // Dice si que si sigue como van, los dos aviones entrarán en conflicto
         public bool HabraConflicto(FlightPlan b, double distanciaSeguridad)
         {
             return DistanciaMinima(b) < distanciaSeguridad;
         }
+
         // Calcula con la derivada las velocidades de este avión con las que pasaría justo a la distancia de seguridad del avión b (una frenando y otra acelerando).
-        
         public List<double> VelocidadesSinConflicto(FlightPlan b, double D)
         {
             List<double> resultado = new List<double>();

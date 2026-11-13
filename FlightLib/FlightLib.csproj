@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GestiónUsuarios.cs" />
+    <Compile Include="GestionUsuarios.cs" />
     <Compile Include="FlightPlan.cs" />
     <Compile Include="FlightPlanList.cs" />
     <Compile Include="Position.cs" />

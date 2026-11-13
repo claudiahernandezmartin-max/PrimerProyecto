@@ -11,15 +11,14 @@ using System.Windows.Forms;
 
 namespace SimulatorForms
 {
-    // Formulario para crear un usuario nuevo en la base de datos
     public partial class Registro : Form
     {
-        GestiónUsuarios gestor;   // el mismo gestor que usa el login
+        GestionUsuarios gestor;   // el mismo gestor que usa el login
         
         // Constructor. Recibe el gestor de usuarios del login
         bool registrado = false;
         Estilo estilo = new Estilo();
-        public Registro(GestiónUsuarios gestor)
+        public Registro(GestionUsuarios gestor)
         {
             InitializeComponent();
             this.gestor = gestor;
@@ -42,12 +41,11 @@ namespace SimulatorForms
         {
             return registrado;
         }
-
-        // Botón Crear cuenta: comprueba los datos y guarda el usuario nuevo
         private void Registro_Load(object sender, EventArgs e)
         {
 
         }
+
         // Botón Crear cuenta: comprueba los datos y guarda el usuario nuevo
         private void buttonCrear_Click(object sender, EventArgs e)
         {

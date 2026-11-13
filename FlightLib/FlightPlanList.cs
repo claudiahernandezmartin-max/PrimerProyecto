@@ -9,15 +9,28 @@ namespace FlightLib
 {
     public class FlightPlanList
     {
-        // Para deshacer: antes de cada paso guardamos dónde estaba cada avión.
-        Stack<List<Position>> historial = new Stack<List<Position>>();
         List<FlightPlan> vuelos = new List<FlightPlan>(); // antes era un vector de 10
+
+        Stack<List<Position>> historial = new Stack<List<Position>>();
+
+
+        // Datos del conflicto futuro encontrado (los rellena BuscarConflictoFuturo)
+        int conflictoA = -1;
+        int conflictoB = -1;
+        double conflictoDistancia = 0;
+        double conflictoTiempo = 0;
+
+        // Datos de la pareja de vuelos más cercana (los rellena DistanciaMinimaActual)
+        int parejaA = -1;
+        int parejaB = -1;
 
         // Añade un vuelo al final de la lista
         public void AddFlightPlan(FlightPlan p)
         {
             vuelos.Add(p);
         }
+
+        // Devuelve el vuelo de la posición i, o null si no existe
         public FlightPlan GetFlightPlan(int i)
         {
             if (i < 0 || i >= vuelos.Count)
@@ -27,6 +40,13 @@ namespace FlightLib
 
             return vuelos[i];
         }
+
+        // Devuelve el número de vuelos de la lista
+        public int GetNumber()
+        {
+            return vuelos.Count;
+        }
+
         // Borra los vuelos guardados para poder meter los nuevos
         public void Vaciar()
         {
@@ -38,17 +58,21 @@ namespace FlightLib
         // Devuelve 0 si va bien, -1 si no existe, -2 si hay datos mal escritos y -3 si hay una velocidad <= 0
         public int CargarFichero(string nombreFichero)
         {
+            if (File.Exists(nombreFichero) == false)
+            {
+                return -1;
+            }
+
             StreamReader F = null;
+            int resultado = 0;
+            List<FlightPlan> nuevos = new List<FlightPlan>();
             try
             {
                 F = new StreamReader(nombreFichero);
-
-                // Los guardamos aparte para no perder los vuelos que había si el fichero está mal
-                List<FlightPlan> nuevos = new List<FlightPlan>();
-
                 string linea = F.ReadLine();
-                while (linea != null)
+                while (linea != null && resultado == 0)
                 {
+                    linea = linea.Trim();
                     if (linea != "") // las líneas vacías se saltan
                     {
                         string[] trozos = linea.Split(' ');
@@ -56,67 +80,97 @@ namespace FlightLib
                         // 6 datos si es un fichero normal, 8 si se guardó con la posición actual
                         if (trozos.Length != 6 && trozos.Length != 8)
                         {
-                            F.Close();
-                            return -2;
+                            resultado = -2;
                         }
-
-                        string id = trozos[0];
-                        double xi = Convert.ToDouble(trozos[1]);
-                        double yi = Convert.ToDouble(trozos[2]);
-                        double xf = Convert.ToDouble(trozos[3]);
-                        double yf = Convert.ToDouble(trozos[4]);
-                        double velocidad = Convert.ToDouble(trozos[5]);
-                        FlightPlan plan = new FlightPlan(id, xi, yi, xf, yf, velocidad);
-
-                        // Velocidad no permitida (<= 0 o mayor que la máxima)
-                        if (plan.VelocidadValida(velocidad) == false)
+                        else
                         {
-                            F.Close();
-                            return -3;
-                        }
+                            string id = trozos[0];
+                            double xi = Convert.ToDouble(trozos[1]);
+                            double yi = Convert.ToDouble(trozos[2]);
+                            double xf = Convert.ToDouble(trozos[3]);
+                            double yf = Convert.ToDouble(trozos[4]);
+                            double velocidad = Convert.ToDouble(trozos[5]);
 
-                        // El vuelo sigue desde donde estaba cuando se guardó
-                        if (trozos.Length == 8)
-                        {
-                            double xa = Convert.ToDouble(trozos[6]);
-                            double ya = Convert.ToDouble(trozos[7]);
-                            plan.SetCurrentPosition(new Position(xa, ya));
+                            // Velocidad 0 o negativa: no se permite
+                            if (velocidad <= 0)
+                            {
+                                resultado = -3;
+                            }
+                            else
+                            {
+                                FlightPlan plan = new FlightPlan(id, xi, yi, xf, yf, velocidad);
+                                if (plan.VelocidadValida(velocidad) == false)
+                                {
+                                    resultado = -3;
+                                }
+                                else
+                                {
+                                    // El vuelo sigue desde donde estaba cuando se guardó
+                                    if (trozos.Length == 8)
+                                    {
+                                        double xa = Convert.ToDouble(trozos[6]);
+                                        double ya = Convert.ToDouble(trozos[7]);
+                                        plan.SetCurrentPosition(new Position(xa, ya));
+                                    }
+                                    nuevos.Add(plan);
+                                }
+                            }
                         }
-
-                        nuevos.Add(plan);
                     }
                     linea = F.ReadLine();
                 }
-                F.Close();
-
-                vuelos = nuevos;
-                historial.Clear();
-                return 0;
-            }
-            catch (FileNotFoundException)
-            {
-                return -1;
             }
             catch (FormatException)
             {
-                F.Close();
-                return -2;
+                resultado = -2;
             }
-        }
-
-        // Guarda los vuelos en el fichero con su posición actual (id xi yi xf yf velocidad xa ya)
-        public void GuardarFichero(string nombreFichero)
-        {
-            StreamWriter W = new StreamWriter(nombreFichero);
-            for (int i = 0; i < vuelos.Count; i++)
+            catch (OverflowException)
             {
-                FlightPlan p = vuelos[i];
-                string linea = p.GetId() + " " + p.GetInitialPosition().GetX() + " " + p.GetInitialPosition().GetY()
-                    + " " + p.GetFinalPosition().GetX() + " " + p.GetFinalPosition().GetY() + " " + p.GetVelocidad()
-                    + " " + p.GetCurrentPosition().GetX() + " " + p.GetCurrentPosition().GetY();
-                W.WriteLine(linea);
+                resultado = -2;
             }
-            W.Close();
+            catch (IOException)
+            {
+                resultado = -1;
+            }
+
+            if (F != null)
+            {
+                F.Close();
+            }
+
+            // Solo cambiamos la lista si todo el fichero estaba bien
+            if (resultado == 0)
+            {
+                vuelos = nuevos;
+                historial.Clear();
+            }
+            return resultado;
+        }
+        // Devuelve true si se ha podido guardar
+        public bool GuardarFichero(string nombreFichero)
+        {
+            try
+            {
+                StreamWriter W = new StreamWriter(nombreFichero);
+                for (int i = 0; i < vuelos.Count; i++)
+                {
+                    FlightPlan p = vuelos[i];
+                    string linea = p.GetId() + " " + p.GetInitialPosition().GetX() + " " + p.GetInitialPosition().GetY()
+                        + " " + p.GetFinalPosition().GetX() + " " + p.GetFinalPosition().GetY() + " " + p.GetVelocidad()
+                        + " " + p.GetCurrentPosition().GetX() + " " + p.GetCurrentPosition().GetY();
+                    W.WriteLine(linea);
+                }
+                W.Close();
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
         }
 
         // Mueve un ciclo todos los vuelos que no han llegado, pero antes de mover guarda las posiciones en el historial para poder deshacer
@@ -145,7 +199,7 @@ namespace FlightLib
             }
         }
 
-        // Deshace el último paso: vuelve a poner cada avión donde estaba antes de moverse
+        // Deshace el último paso, vuelve a poner cada avión donde estaba antes de moverse
         public bool Deshacer()
         {
             if (historial.Count == 0)
@@ -160,11 +214,9 @@ namespace FlightLib
             }
             return true;
         }
-        public int GetNumber()
-        {
-            return vuelos.Count;
-        }
 
+        // Dice si todos los vuelos han llegado a su destino
+        // Devuelve true si han llegado todos
         public bool TodosHanLlegado()
         {
             for (int i = 0; i < vuelos.Count; i++)
@@ -220,18 +272,10 @@ namespace FlightLib
         }
         public bool HayConflicto(double D)
         { for (int i = 0; i < vuelos.Count; i++) if (EnConflicto(i, D)) return true; return false; }
-
-        // Datos del conflicto futuro encontrado (los rellena BuscarConflictoFuturo)
-        int conflictoA = -1;
-        int conflictoB = -1;
-        double conflictoDistancia = 0;
-        double conflictoTiempo = 0;
-
-        // Datos de la pareja más cercana (los rellena DistanciaMinimaActual)
-        int parejaA = -1;
-        int parejaB = -1;
-
-        // Conflicto FUTURO: busca la primera pareja que entrará en conflicto
+        
+        // Busca la primera pareja de vuelos que entrará en conflicto si siguen como van
+        // Guarda la pareja, la distancia mínima y el instante, lo miramos con los Get de abajo
+        // Devuelve true si ha encontrado alguna
         public bool BuscarConflictoFuturo(double D)
         {
             conflictoA = -1;
@@ -277,7 +321,7 @@ namespace FlightLib
             return conflictoTiempo;
         }
 
-        // Cuenta cuántas parejas de vuelos entrarán en conflicto
+        // Cuenta cuántas parejas de vuelos entrarán en conflicto y devuelve el número
         public int ContarConflictosFuturos(double D)
         {
             int n = 0;
@@ -294,8 +338,7 @@ namespace FlightLib
             return n;
         }
 
-        // Cuenta con cuántos vuelos entrará en conflicto el vuelo f,
-        // mirando solo los vuelos de la posición 0 hasta "hasta" (sin incluirlo)
+        // Cuenta con cuántos vuelos entrará en conflicto el vuelo f, mirando solo los vuelos de la posición 0 hasta "hasta" (sin incluirlo)
         private int ConflictosDe(int f, double D, int hasta)
         {
             int n = 0;
@@ -421,6 +464,8 @@ namespace FlightLib
         {
             return parejaB;
         }
+
+        // Escribe en la consola los datos de todos los vuelos
         public void EscribeConsola()
         {
             int i = 0;
