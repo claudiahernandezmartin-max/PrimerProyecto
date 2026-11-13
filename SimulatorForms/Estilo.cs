@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace SimulatorForms
@@ -184,24 +183,25 @@ namespace SimulatorForms
         // =====================================================================
 
         // Altura de la cabecera azul que se pone arriba en cada ventana
-        public const int AltoCabecera = 96;
-
-        // Colores para que otras clases (como Tarjeta) puedan usarlos
-        public Color ColorAzulNoche { get { return colorCielo; } }
-        public Color ColorAzul { get { return colorCieloClaro; } }
-        public Color ColorNaranja { get { return colorNaranja; } }
-        public Color ColorFondo { get { return colorFondo; } }
-        public Color ColorTexto { get { return colorTexto; } }
-
-        // Panel que no parpadea al repintarse (se usa para la cabecera)
-        private class PanelCabecera : Panel
+        public int GetAltoCabecera()
         {
-            public PanelCabecera()
-            {
-                this.DoubleBuffered = true;
-                this.ResizeRedraw = true;
-            }
+            return 96;
         }
+
+        // Métodos para consultar los colores desde otros formularios.
+        public Color GetColorAzul()
+        {
+            return colorCieloClaro;
+        }
+
+        public Color GetColorTexto()
+        {
+            return colorTexto;
+        }
+
+        // Datos que se muestran en la cabecera.
+        string tituloCabecera;
+        string subtituloCabecera;
 
         // Pone la cabecera con el cielo, el avión y el título (igual que en el login).
         // Si desplazar es true, baja todos los controles de la ventana para que no queden debajo
@@ -216,22 +216,29 @@ namespace SimulatorForms
                     Control c = f.Controls[i];
                     if (c.Dock == DockStyle.None)
                     {
-                        c.Top = c.Top + AltoCabecera;
+                        c.Top = c.Top + GetAltoCabecera();
                     }
                     i++;
                 }
-                f.ClientSize = new Size(f.ClientSize.Width, f.ClientSize.Height + AltoCabecera);
+                f.ClientSize = new Size(f.ClientSize.Width, f.ClientSize.Height + GetAltoCabecera());
             }
 
-            PanelCabecera panel = new PanelCabecera();
+            tituloCabecera = titulo;
+            subtituloCabecera = subtitulo;
+
+            Panel panel = new Panel();
             panel.Dock = DockStyle.Top;
-            panel.Height = AltoCabecera;
-            panel.Paint += delegate (object sender, PaintEventArgs e)
-            {
-                DibujarCabecera(e.Graphics, panel.Width, panel.Height, titulo, subtitulo);
-            };
+            panel.Height = GetAltoCabecera();
+            panel.Paint += PintarCabecera;
             f.Controls.Add(panel);
             panel.SendToBack();   // así se coloca arriba del todo y lo demás se reparte debajo
+        }
+
+        // Dibuja la cabecera cuando Windows Forms necesita repintar el panel.
+        private void PintarCabecera(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            DibujarCabecera(e.Graphics, panel.Width, panel.Height, tituloCabecera, subtituloCabecera);
         }
 
         // Ventana normal: fondo, centrada y con el título del programa
@@ -251,7 +258,7 @@ namespace SimulatorForms
         }
 
         // Rectángulo con las esquinas redondeadas
-        public static GraphicsPath RectRedondo(Rectangle r, int radio)
+        public GraphicsPath RectRedondo(Rectangle r, int radio)
         {
             GraphicsPath ruta = new GraphicsPath();
             int d = radio * 2;
@@ -496,179 +503,6 @@ namespace SimulatorForms
             lapiz.Dispose();
             pincel.Dispose();
             g.Restore(estado);
-        }
-    }
-
-    // Botón grande del menú: círculo con un icono + título + descripción corta.
-    // Se usa igual que un botón: tarjeta.Click += ...
-    public class Tarjeta : Control
-    {
-        Estilo estilo = new Estilo();
-        string titulo;
-        string descripcion;
-        string icono;
-        bool principal;       // true = naranja (el botón más importante)
-        bool encima = false;  // true si el ratón está encima
-        Font fuenteTitulo = new Font("Segoe UI", 11, FontStyle.Bold);
-        Font fuenteDescripcion = new Font("Segoe UI", 9);
-
-        public Tarjeta(string titulo, string descripcion, string icono, bool principal)
-        {
-            this.titulo = titulo;
-            this.descripcion = descripcion;
-            this.icono = icono;
-            this.principal = principal;
-
-            this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint
-                | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
-            this.TabStop = true;
-            this.Cursor = Cursors.Hand;
-            this.Size = new Size(310, 88);
-            this.Text = titulo;
-        }
-
-        protected override void OnMouseEnter(EventArgs e)
-        {
-            encima = true;
-            Invalidate();
-            base.OnMouseEnter(e);
-        }
-
-        protected override void OnMouseLeave(EventArgs e)
-        {
-            encima = false;
-            Invalidate();
-            base.OnMouseLeave(e);
-        }
-
-        protected override void OnGotFocus(EventArgs e)
-        {
-            Invalidate();
-            base.OnGotFocus(e);
-        }
-
-        protected override void OnLostFocus(EventArgs e)
-        {
-            Invalidate();
-            base.OnLostFocus(e);
-        }
-
-        // Con el teclado: Enter o espacio equivalen a hacer clic
-        protected override bool IsInputKey(Keys keyData)
-        {
-            if (keyData == Keys.Enter)
-            {
-                return true;
-            }
-            return base.IsInputKey(keyData);
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Space)
-            {
-                OnClick(EventArgs.Empty);
-                e.Handled = true;
-            }
-            base.OnKeyDown(e);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-
-            if (Parent != null)
-            {
-                g.Clear(Parent.BackColor);   // rellena las esquinas con el fondo de la ventana
-            }
-
-            float k = Height / 88f;   // por si la tarjeta cambia de tamaño
-            Rectangle r = new Rectangle(1, 1, Width - 3, Height - 3);
-
-            // Colores según sea principal o normal, y según el ratón
-            Color fondo = Color.White;
-            Color borde = Color.FromArgb(214, 222, 235);
-            Color colorTitulo = estilo.ColorAzulNoche;
-            Color colorDescripcion = Color.FromArgb(100, 110, 125);
-            Color fondoCirculo = Color.FromArgb(226, 236, 252);
-            Color colorIcono = estilo.ColorAzul;
-
-            if (principal)
-            {
-                fondo = estilo.ColorNaranja;
-                borde = estilo.ColorNaranja;
-                colorTitulo = Color.White;
-                colorDescripcion = Color.FromArgb(240, 255, 255, 255);
-                fondoCirculo = Color.FromArgb(70, 255, 255, 255);
-                colorIcono = Color.White;
-                if (encima)
-                {
-                    fondo = Color.FromArgb(238, 95, 50);
-                    borde = fondo;
-                }
-            }
-            else if (encima)
-            {
-                fondo = Color.FromArgb(240, 246, 255);
-                borde = estilo.ColorAzul;
-            }
-
-            // Tarjeta
-            using (GraphicsPath ruta = Estilo.RectRedondo(r, 14))
-            using (SolidBrush pincelFondo = new SolidBrush(fondo))
-            using (Pen lapizBorde = new Pen(borde, encima ? 2 : 1))
-            {
-                g.FillPath(pincelFondo, ruta);
-                g.DrawPath(lapizBorde, ruta);
-            }
-
-            // Círculo con el icono
-            float d = 52 * k;
-            RectangleF circulo = new RectangleF(18 * k, (Height - d) / 2f, d, d);
-            using (SolidBrush pincelCirculo = new SolidBrush(fondoCirculo))
-            {
-                g.FillEllipse(pincelCirculo, circulo);
-            }
-            float margen = 12 * k;
-            estilo.DibujarIcono(g, icono, new RectangleF(circulo.X + margen, circulo.Y + margen, d - 2 * margen, d - 2 * margen), colorIcono);
-
-            // Título y descripción
-            float x = circulo.Right + 16 * k;
-            float ancho = Width - x - 12;
-            float alturaTexto = fuenteTitulo.Height + fuenteDescripcion.Height + 2;
-            float y = (Height - alturaTexto) / 2f;
-            StringFormat formato = new StringFormat();
-            formato.Trimming = StringTrimming.EllipsisCharacter;
-            formato.FormatFlags = StringFormatFlags.NoWrap;
-            using (SolidBrush pincelTitulo = new SolidBrush(colorTitulo))
-            using (SolidBrush pincelDescripcion = new SolidBrush(colorDescripcion))
-            {
-                g.DrawString(titulo, fuenteTitulo, pincelTitulo, new RectangleF(x, y, ancho, fuenteTitulo.Height), formato);
-                g.DrawString(descripcion, fuenteDescripcion, pincelDescripcion, new RectangleF(x, y + fuenteTitulo.Height + 2, ancho, fuenteDescripcion.Height), formato);
-            }
-
-            // Marco de foco cuando se llega con el teclado (Tab)
-            if (Focused)
-            {
-                using (GraphicsPath ruta = Estilo.RectRedondo(new Rectangle(4, 4, Width - 9, Height - 9), 11))
-                using (Pen lapizFoco = new Pen(principal ? Color.White : estilo.ColorAzul, 1))
-                {
-                    lapizFoco.DashStyle = DashStyle.Dot;
-                    g.DrawPath(lapizFoco, ruta);
-                }
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                fuenteTitulo.Dispose();
-                fuenteDescripcion.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 

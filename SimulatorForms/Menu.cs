@@ -42,24 +42,18 @@ namespace SimulatorForms
             int alto = 88;
             int hueco = 20;        // espacio entre las dos columnas
             int separacion = 16;   // espacio entre filas
-            int arriba = Estilo.AltoCabecera + 28;
+            int arriba = estilo.GetAltoCabecera() + 28;
 
-            // Cada botón: título, descripción corta, icono, y si es el principal (naranja)
-            Tarjeta[] tarjetas = new Tarjeta[6];
-            tarjetas[0] = new Tarjeta("Planes de vuelo", "Escribe los datos de los vuelos", "planes", false);
-            tarjetas[0].Click += new EventHandler(planesDeVueloToolStripMenuItem_Click);
-            tarjetas[1] = new Tarjeta("Cargar desde fichero", "Abre un fichero con vuelos", "carpeta", false);
-            tarjetas[1].Click += new EventHandler(cargarPlanesDesdeFicheroToolStripMenuItem_Click);
-            tarjetas[2] = new Tarjeta("Vuelos de prueba", "Carga los 8 vuelos de ejemplo", "prueba", false);
-            tarjetas[2].Click += new EventHandler(cargarVuelosDePruebaToolStripMenuItem_Click);
-            tarjetas[3] = new Tarjeta("Continuar guardada", "Sigue donde lo dejaste", "historial", false);
-            tarjetas[3].Click += new EventHandler(continuarSimulacionGuardadaToolStripMenuItem_Click);
-            tarjetas[4] = new Tarjeta("Distancia y ciclo", "Ajusta la seguridad y el tiempo", "parametros", false);
-            tarjetas[4].Click += new EventHandler(distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click);
-            tarjetas[5] = new Tarjeta("Simulación", "Lanza la simulación", "simulacion", true);
-            tarjetas[5].Click += new EventHandler(simulacionToolStripMenuItem_Click);
+            // Cada tarjeta se construye con controles normales de Windows Forms.
+            Panel[] tarjetas = new Panel[6];
+            tarjetas[0] = CrearTarjeta("Planes de vuelo", "Escribe los datos de los vuelos", "planes", false, 0);
+            tarjetas[1] = CrearTarjeta("Cargar desde fichero", "Abre un fichero con vuelos", "carpeta", false, 1);
+            tarjetas[2] = CrearTarjeta("Vuelos de prueba", "Carga los 8 vuelos de ejemplo", "prueba", false, 2);
+            tarjetas[3] = CrearTarjeta("Continuar guardada", "Sigue donde lo dejaste", "historial", false, 3);
+            tarjetas[4] = CrearTarjeta("Distancia y ciclo", "Ajusta la seguridad y el tiempo", "parametros", false, 4);
+            tarjetas[5] = CrearTarjeta("Simulación", "Lanza la simulación", "simulacion", true, 5);
 
-            // Se colocan de dos en dos
+            // Se colocan de dos en dos.
             int i = 0;
             while (i < tarjetas.Length)
             {
@@ -67,7 +61,6 @@ namespace SimulatorForms
                 int fila = i / 2;
                 tarjetas[i].Size = new Size(ancho, alto);
                 tarjetas[i].Location = new Point(margen + columna * (ancho + hueco), arriba + fila * (alto + separacion));
-                tarjetas[i].TabIndex = i;
                 this.Controls.Add(tarjetas[i]);
                 i++;
             }
@@ -84,6 +77,95 @@ namespace SimulatorForms
             this.ClientSize = new Size(2 * margen + 2 * ancho + hueco, labelVuelos.Bottom + 24);
             estilo.PonerCabecera(this, "Deconflicting Tool", "Centro de control de vuelos", false);
             ActualizarContador();
+        }
+
+        // Crea una tarjeta usando únicamente Panel, PictureBox y Label.
+        private Panel CrearTarjeta(string titulo, string descripcion, string icono, bool principal, int accion)
+        {
+            Panel tarjeta = new Panel();
+            tarjeta.Size = new Size(310, 88);
+            tarjeta.BorderStyle = BorderStyle.FixedSingle;
+            tarjeta.Cursor = Cursors.Hand;
+
+            Color fondo = Color.White;
+            Color colorTitulo = Color.FromArgb(11, 31, 58);
+            Color colorDescripcion = Color.FromArgb(100, 110, 125);
+            Color fondoIcono = Color.FromArgb(226, 236, 252);
+            Color colorIcono = estilo.GetColorAzul();
+
+            if (principal)
+            {
+                fondo = Color.FromArgb(255, 112, 67);
+                colorTitulo = Color.White;
+                colorDescripcion = Color.White;
+                fondoIcono = Color.FromArgb(255, 145, 110);
+                colorIcono = Color.White;
+            }
+
+            tarjeta.BackColor = fondo;
+
+            PictureBox imagen = new PictureBox();
+            imagen.Location = new Point(18, 18);
+            imagen.Size = new Size(52, 52);
+            imagen.BackColor = fondoIcono;
+            imagen.SizeMode = PictureBoxSizeMode.CenterImage;
+            imagen.Image = estilo.CrearIcono(icono, 28, colorIcono);
+
+            Label etiquetaTitulo = new Label();
+            etiquetaTitulo.Location = new Point(84, 22);
+            etiquetaTitulo.Size = new Size(210, 24);
+            etiquetaTitulo.Text = titulo;
+            etiquetaTitulo.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            etiquetaTitulo.ForeColor = colorTitulo;
+            etiquetaTitulo.BackColor = Color.Transparent;
+
+            Label etiquetaDescripcion = new Label();
+            etiquetaDescripcion.Location = new Point(84, 48);
+            etiquetaDescripcion.Size = new Size(210, 22);
+            etiquetaDescripcion.Text = descripcion;
+            etiquetaDescripcion.Font = new Font("Segoe UI", 9);
+            etiquetaDescripcion.ForeColor = colorDescripcion;
+            etiquetaDescripcion.BackColor = Color.Transparent;
+
+            tarjeta.Controls.Add(imagen);
+            tarjeta.Controls.Add(etiquetaTitulo);
+            tarjeta.Controls.Add(etiquetaDescripcion);
+
+            AsignarAccion(tarjeta, accion);
+            AsignarAccion(imagen, accion);
+            AsignarAccion(etiquetaTitulo, accion);
+            AsignarAccion(etiquetaDescripcion, accion);
+
+            return tarjeta;
+        }
+
+        // Asigna la acción correspondiente a la tarjeta y a los controles que contiene.
+        private void AsignarAccion(Control control, int accion)
+        {
+            if (accion == 0)
+            {
+                control.Click += planesDeVueloToolStripMenuItem_Click;
+            }
+            else if (accion == 1)
+            {
+                control.Click += cargarPlanesDesdeFicheroToolStripMenuItem_Click;
+            }
+            else if (accion == 2)
+            {
+                control.Click += cargarVuelosDePruebaToolStripMenuItem_Click;
+            }
+            else if (accion == 3)
+            {
+                control.Click += continuarSimulacionGuardadaToolStripMenuItem_Click;
+            }
+            else if (accion == 4)
+            {
+                control.Click += distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click;
+            }
+            else if (accion == 5)
+            {
+                control.Click += simulacionToolStripMenuItem_Click;
+            }
         }
 
         // Actualiza el texto de abajo con el número de vuelos cargados

@@ -75,7 +75,7 @@ namespace SimulatorForms
             while (i < titulos.Length)
             {
                 titulos[i].Font = new Font("Segoe UI", 13, FontStyle.Bold);
-                titulos[i].ForeColor = estilo.ColorAzul;
+                titulos[i].ForeColor = estilo.GetColorAzul();
                 titulos[i].BackColor = Color.Transparent;
                 i++;
             }
