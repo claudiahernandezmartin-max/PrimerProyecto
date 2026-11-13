@@ -19,7 +19,6 @@ namespace SimulatorForms
         public Login()
         {
             InitializeComponent();
-            // Aspecto de la ventana
             estilo.PonerFormulario(this);
             estilo.PonerEtiqueta(labelUsuario);
             estilo.PonerEtiqueta(labelPassword);
