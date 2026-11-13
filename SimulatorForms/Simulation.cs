@@ -15,6 +15,7 @@ namespace SimulatorForms
         List<PictureBox> aviones = new List<PictureBox>();   // un PictureBox por vuelo
         int tamanoAvion = 32;   // lado en píxeles de cada PictureBox
         Estilo estilo = new Estilo();   // colores y dibujos de la simulación
+        bool alarmaMostrada = false;    // para que la alarma salte una sola vez por cada conflicto
 
         public Simulation(FlightPlanList lista, double distanciaSeguridad, double tiempoCiclo)
         {
@@ -137,14 +138,23 @@ namespace SimulatorForms
                 labelDistancia.Text = string.Format("Pareja más cercana: {0} y {1} (distancia {2:F2})",
                     lista.GetFlightPlan(p).GetId(), lista.GetFlightPlan(q).GetId(), dActual);
             }
-
             if (lista.HayConflicto(distanciaSeguridad))
             {
                 labelEstado.Text = "CONFLICTO Hay vuelos a menos de la distancia de seguridad";
                 labelEstado.ForeColor = Color.Red;
+
+                // Alarma: solo la primera vez que aparece el conflicto
+                if (alarmaMostrada == false)
+                {
+                    alarmaMostrada = true;
+                    MessageBox.Show(string.Format("¡ALARMA! Los vuelos {0} y {1} están a {2:F2}, menos que la distancia de seguridad ({3:F2}).",
+                        lista.GetFlightPlan(p).GetId(), lista.GetFlightPlan(q).GetId(), dActual, distanciaSeguridad),
+                        "Alarma de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             else if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
+                alarmaMostrada = false;
                 int a = lista.GetConflictoA();
                 int b = lista.GetConflictoB();
                 labelEstado.Text = string.Format("Aviso: {0} y {1} entrarán en conflicto (dist. mínima {2:F2} dentro de {3:F1} ciclos)",
@@ -153,6 +163,7 @@ namespace SimulatorForms
             }
             else
             {
+                alarmaMostrada = false;
                 labelEstado.Text = "No habrá conflicto";
                 labelEstado.ForeColor = Color.Green;
             }
@@ -426,7 +437,7 @@ namespace SimulatorForms
             buttonDetener.Enabled = false;
             buttonMover.Enabled = true;
 
-            lista.GuardarFichero("vuelos_guardados.txt");
+            lista.GuardarFichero("Todos los documentos\\vuelos_guardados.txt");
             MessageBox.Show("Vuelos guardados. Para seguir otro día: Menú → Continuar simulación guardada.");
         }
 
