@@ -27,13 +27,6 @@ namespace SimulatorForms
             estilo.PonerCabecera(this, "Parámetros", "Ajusta la simulación", true);
         }
 
-        // Pone en las cajas los valores que hay ahora
-        public void SetDatos(double distancia, double ciclo)
-        {
-            TextBoxDistancia.Text = distancia.ToString();
-            TextBoxCiclo.Text = ciclo.ToString();
-        }
-
         public double GetDistancia()
         {
             return distancia;

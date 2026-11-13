@@ -207,7 +207,6 @@ namespace SimulatorForms
         private void distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ParametrosForm f = new ParametrosForm();
-            f.SetDatos(distanciaSeguridad, tiempoCiclo);
             f.ShowDialog();
 
             if (f.GetAceptado() == true)

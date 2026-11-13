@@ -60,6 +60,15 @@ namespace SimulatorForms
             estilo.PonerTabla(dataGridViewVelocidades);
 
             estilo.PonerCabecera(this, "Simulación", "Controla los vuelos y detecta conflictos", true);
+            // Frase de ayuda debajo de los botones para encontrar las distancias entre aviones
+            Label ayudaDistancias = new Label();
+            ayudaDistancias.Text = "Distancias entre aviones: pulsa «Ver datos» y elige un vuelo";
+            ayudaDistancias.Font = new Font("Segoe UI", 9, FontStyle.Italic);
+            ayudaDistancias.ForeColor = Color.FromArgb(100, 110, 125);
+            ayudaDistancias.AutoSize = false;
+            ayudaDistancias.Location = new Point(buttonVelocidadesOriginales.Left, buttonVerDatos.Bottom + 3);
+            ayudaDistancias.Size = new Size(410, 18);
+            this.Controls.Add(ayudaDistancias);
         }
 
         private void panelSimulacion_Paint(object sender, PaintEventArgs e)

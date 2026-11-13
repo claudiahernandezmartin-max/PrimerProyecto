@@ -173,7 +173,7 @@ namespace SimulatorForms
             // 
             // columnaVelocidad
             // 
-            this.columnaVelocidad.HeaderText = "Velocidad";
+            this.columnaVelocidad.HeaderText = "Velocidad (clic para cambiarla)";
             this.columnaVelocidad.MinimumWidth = 6;
             this.columnaVelocidad.Name = "columnaVelocidad";
             // 
