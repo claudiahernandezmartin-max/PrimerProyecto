@@ -58,7 +58,7 @@ namespace SimulatorForms
             // 
             this.panelSimulacion.BackColor = System.Drawing.SystemColors.ButtonShadow;
             this.panelSimulacion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelSimulacion.Location = new System.Drawing.Point(12, 12);
+            this.panelSimulacion.Location = new System.Drawing.Point(20, 12);
             this.panelSimulacion.Name = "panelSimulacion";
             this.panelSimulacion.Size = new System.Drawing.Size(688, 567);
             this.panelSimulacion.TabIndex = 0;
@@ -66,9 +66,9 @@ namespace SimulatorForms
             // 
             // buttonMover
             // 
-            this.buttonMover.Location = new System.Drawing.Point(733, 48);
+            this.buttonMover.Location = new System.Drawing.Point(1010, 12);
             this.buttonMover.Name = "buttonMover";
-            this.buttonMover.Size = new System.Drawing.Size(143, 61);
+            this.buttonMover.Size = new System.Drawing.Size(130, 48);
             this.buttonMover.TabIndex = 1;
             this.buttonMover.Text = "Mover";
             this.buttonMover.UseVisualStyleBackColor = true;
@@ -76,9 +76,9 @@ namespace SimulatorForms
             // 
             // buttonIniciar
             // 
-            this.buttonIniciar.Location = new System.Drawing.Point(733, 127);
+            this.buttonIniciar.Location = new System.Drawing.Point(730, 12);
             this.buttonIniciar.Name = "buttonIniciar";
-            this.buttonIniciar.Size = new System.Drawing.Size(143, 63);
+            this.buttonIniciar.Size = new System.Drawing.Size(130, 48);
             this.buttonIniciar.TabIndex = 2;
             this.buttonIniciar.Text = "Iniciar";
             this.buttonIniciar.UseVisualStyleBackColor = true;
@@ -87,9 +87,9 @@ namespace SimulatorForms
             // buttonDetener
             // 
             this.buttonDetener.Enabled = false;
-            this.buttonDetener.Location = new System.Drawing.Point(733, 215);
+            this.buttonDetener.Location = new System.Drawing.Point(870, 12);
             this.buttonDetener.Name = "buttonDetener";
-            this.buttonDetener.Size = new System.Drawing.Size(143, 64);
+            this.buttonDetener.Size = new System.Drawing.Size(130, 48);
             this.buttonDetener.TabIndex = 3;
             this.buttonDetener.Text = "Detener";
             this.buttonDetener.UseVisualStyleBackColor = true;
@@ -101,9 +101,9 @@ namespace SimulatorForms
             // 
             // buttonVerDatos
             // 
-            this.buttonVerDatos.Location = new System.Drawing.Point(733, 304);
+            this.buttonVerDatos.Location = new System.Drawing.Point(870, 362);
             this.buttonVerDatos.Name = "buttonVerDatos";
-            this.buttonVerDatos.Size = new System.Drawing.Size(143, 64);
+            this.buttonVerDatos.Size = new System.Drawing.Size(130, 48);
             this.buttonVerDatos.TabIndex = 4;
             this.buttonVerDatos.Text = "Ver datos";
             this.buttonVerDatos.UseVisualStyleBackColor = true;
@@ -111,9 +111,9 @@ namespace SimulatorForms
             // 
             // Conflicte
             // 
-            this.Conflicte.Location = new System.Drawing.Point(733, 391);
+            this.Conflicte.Location = new System.Drawing.Point(1010, 362);
             this.Conflicte.Name = "Conflicte";
-            this.Conflicte.Size = new System.Drawing.Size(143, 68);
+            this.Conflicte.Size = new System.Drawing.Size(130, 48);
             this.Conflicte.TabIndex = 5;
             this.Conflicte.Text = "Conflicto";
             this.Conflicte.UseVisualStyleBackColor = true;
@@ -121,9 +121,9 @@ namespace SimulatorForms
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(733, 481);
+            this.button1.Location = new System.Drawing.Point(870, 70);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(143, 61);
+            this.button1.Size = new System.Drawing.Size(130, 48);
             this.button1.TabIndex = 6;
             this.button1.Text = "Restart";
             this.button1.UseVisualStyleBackColor = true;
@@ -131,17 +131,17 @@ namespace SimulatorForms
             // 
             // labelEstado
             // 
-            this.labelEstado.AutoSize = true;
-            this.labelEstado.Location = new System.Drawing.Point(293, 640);
+            this.labelEstado.AutoSize = false;
+            this.labelEstado.Location = new System.Drawing.Point(730, 464);
             this.labelEstado.Name = "labelEstado";
-            this.labelEstado.Size = new System.Drawing.Size(50, 16);
+            this.labelEstado.Size = new System.Drawing.Size(410, 84);
             this.labelEstado.TabIndex = 7;
             this.labelEstado.Text = "Estado";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(904, 48);
+            this.label1.Location = new System.Drawing.Point(730, 136);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(137, 16);
             this.label1.TabIndex = 8;
@@ -156,12 +156,12 @@ namespace SimulatorForms
             this.dataGridViewVelocidades.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.columnaVuelo,
             this.columnaVelocidad});
-            this.dataGridViewVelocidades.Location = new System.Drawing.Point(907, 86);
+            this.dataGridViewVelocidades.Location = new System.Drawing.Point(730, 160);
             this.dataGridViewVelocidades.Name = "dataGridViewVelocidades";
             this.dataGridViewVelocidades.RowHeadersVisible = false;
             this.dataGridViewVelocidades.RowHeadersWidth = 51;
             this.dataGridViewVelocidades.RowTemplate.Height = 24;
-            this.dataGridViewVelocidades.Size = new System.Drawing.Size(240, 150);
+            this.dataGridViewVelocidades.Size = new System.Drawing.Size(410, 190);
             this.dataGridViewVelocidades.TabIndex = 9;
             this.dataGridViewVelocidades.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewVelocidades_CellEndEdit);
             // 
@@ -179,9 +179,9 @@ namespace SimulatorForms
             // 
             // buttonVelocidadesOriginales
             // 
-            this.buttonVelocidadesOriginales.Location = new System.Drawing.Point(964, 262);
+            this.buttonVelocidadesOriginales.Location = new System.Drawing.Point(730, 362);
             this.buttonVelocidadesOriginales.Name = "buttonVelocidadesOriginales";
-            this.buttonVelocidadesOriginales.Size = new System.Drawing.Size(143, 64);
+            this.buttonVelocidadesOriginales.Size = new System.Drawing.Size(130, 48);
             this.buttonVelocidadesOriginales.TabIndex = 10;
             this.buttonVelocidadesOriginales.Text = "Originales";
             this.buttonVelocidadesOriginales.UseVisualStyleBackColor = true;
@@ -189,20 +189,20 @@ namespace SimulatorForms
             // 
             // labelDistancia
             // 
-            this.labelDistancia.AutoSize = true;
-            this.labelDistancia.Location = new System.Drawing.Point(122, 601);
+            this.labelDistancia.AutoSize = false;
+            this.labelDistancia.Location = new System.Drawing.Point(730, 432);
             this.labelDistancia.Name = "labelDistancia";
-            this.labelDistancia.Size = new System.Drawing.Size(128, 16);
+            this.labelDistancia.Size = new System.Drawing.Size(410, 24);
             this.labelDistancia.TabIndex = 11;
             this.labelDistancia.Text = "Pareja más cercana";
             this.labelDistancia.Click += new System.EventHandler(this.label2_Click);
             // 
             // buttonGuardar
             // 
-            this.buttonGuardar.Location = new System.Drawing.Point(964, 357);
+            this.buttonGuardar.Location = new System.Drawing.Point(1010, 70);
             this.buttonGuardar.Margin = new System.Windows.Forms.Padding(2);
             this.buttonGuardar.Name = "buttonGuardar";
-            this.buttonGuardar.Size = new System.Drawing.Size(143, 74);
+            this.buttonGuardar.Size = new System.Drawing.Size(130, 48);
             this.buttonGuardar.TabIndex = 13;
             this.buttonGuardar.Text = "Guardar";
             this.buttonGuardar.UseVisualStyleBackColor = true;
@@ -210,9 +210,9 @@ namespace SimulatorForms
             // 
             // buttonDeshacer
             // 
-            this.buttonDeshacer.Location = new System.Drawing.Point(964, 462);
+            this.buttonDeshacer.Location = new System.Drawing.Point(730, 70);
             this.buttonDeshacer.Name = "buttonDeshacer";
-            this.buttonDeshacer.Size = new System.Drawing.Size(143, 64);
+            this.buttonDeshacer.Size = new System.Drawing.Size(130, 48);
             this.buttonDeshacer.TabIndex = 14;
             this.buttonDeshacer.Text = "Deshacer Paso";
             this.buttonDeshacer.UseVisualStyleBackColor = true;
@@ -222,7 +222,7 @@ namespace SimulatorForms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1283, 675);
+            this.ClientSize = new System.Drawing.Size(1160, 599);
             this.Controls.Add(this.buttonDeshacer);
             this.Controls.Add(this.buttonGuardar);
             this.Controls.Add(this.labelDistancia);

@@ -21,9 +21,75 @@ namespace SimulatorForms
         double tiempoCiclo = 2;
         bool reiniciar = true; // false justo después de cargar un fichero, para seguir desde donde se guardó
 
+        Estilo estilo = new Estilo();
+        Label labelVuelos = new Label();   // "Vuelos cargados: N", abajo del todo
+
         public Menu()
         {
             InitializeComponent();
+            CrearInterfaz();
+        }
+
+        // Crea la cabecera y los 6 botones grandes con icono (antes era una barra de menús gris)
+        private void CrearInterfaz()
+        {
+            estilo.PonerVentana(this, "Menú");
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+
+            int margen = 40;
+            int ancho = 310;
+            int alto = 88;
+            int hueco = 20;        // espacio entre las dos columnas
+            int separacion = 16;   // espacio entre filas
+            int arriba = Estilo.AltoCabecera + 28;
+
+            // Cada botón: título, descripción corta, icono, y si es el principal (naranja)
+            Tarjeta[] tarjetas = new Tarjeta[6];
+            tarjetas[0] = new Tarjeta("Planes de vuelo", "Escribe los datos de los vuelos", "planes", false);
+            tarjetas[0].Click += new EventHandler(planesDeVueloToolStripMenuItem_Click);
+            tarjetas[1] = new Tarjeta("Cargar desde fichero", "Abre un fichero con vuelos", "carpeta", false);
+            tarjetas[1].Click += new EventHandler(cargarPlanesDesdeFicheroToolStripMenuItem_Click);
+            tarjetas[2] = new Tarjeta("Vuelos de prueba", "Carga los 8 vuelos de ejemplo", "prueba", false);
+            tarjetas[2].Click += new EventHandler(cargarVuelosDePruebaToolStripMenuItem_Click);
+            tarjetas[3] = new Tarjeta("Continuar guardada", "Sigue donde lo dejaste", "historial", false);
+            tarjetas[3].Click += new EventHandler(continuarSimulacionGuardadaToolStripMenuItem_Click);
+            tarjetas[4] = new Tarjeta("Distancia y ciclo", "Ajusta la seguridad y el tiempo", "parametros", false);
+            tarjetas[4].Click += new EventHandler(distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click);
+            tarjetas[5] = new Tarjeta("Simulación", "Lanza la simulación", "simulacion", true);
+            tarjetas[5].Click += new EventHandler(simulacionToolStripMenuItem_Click);
+
+            // Se colocan de dos en dos
+            int i = 0;
+            while (i < tarjetas.Length)
+            {
+                int columna = i % 2;
+                int fila = i / 2;
+                tarjetas[i].Size = new Size(ancho, alto);
+                tarjetas[i].Location = new Point(margen + columna * (ancho + hueco), arriba + fila * (alto + separacion));
+                tarjetas[i].TabIndex = i;
+                this.Controls.Add(tarjetas[i]);
+                i++;
+            }
+
+            // Texto de abajo con los vuelos que hay cargados
+            estilo.PonerEtiqueta(labelVuelos);
+            labelVuelos.ForeColor = Color.FromArgb(100, 110, 125);
+            labelVuelos.AutoSize = false;
+            labelVuelos.TextAlign = ContentAlignment.MiddleLeft;
+            labelVuelos.Location = new Point(margen, arriba + 3 * alto + 2 * separacion + 16);
+            labelVuelos.Size = new Size(2 * ancho + hueco, 24);
+            this.Controls.Add(labelVuelos);
+
+            this.ClientSize = new Size(2 * margen + 2 * ancho + hueco, labelVuelos.Bottom + 24);
+            estilo.PonerCabecera(this, "Deconflicting Tool", "Centro de control de vuelos", false);
+            ActualizarContador();
+        }
+
+        // Actualiza el texto de abajo con el número de vuelos cargados
+        private void ActualizarContador()
+        {
+            labelVuelos.Text = "Vuelos cargados: " + lista.GetNumber();
         }
 
         private void planesDeVueloToolStripMenuItem_Click(object sender, EventArgs e)
@@ -31,6 +97,7 @@ namespace SimulatorForms
             FlightPlansInterface f = new FlightPlansInterface();
             f.SetLista(lista);
             f.ShowDialog();
+            ActualizarContador();
 
         }
 
@@ -99,6 +166,7 @@ namespace SimulatorForms
                     MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos.");
                 }
             }
+            ActualizarContador();
         }
         // Carga el fichero de prueba sin tener que buscarlo (está en bin\Debug, junto al programa)
         private void cargarVuelosDePruebaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -118,6 +186,7 @@ namespace SimulatorForms
                 reiniciar = false;
                 MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos de prueba.");
             }
+            ActualizarContador();
         }
 
         // Carga los vuelos que se guardaron con el botón Guardar, para seguir donde se dejó
@@ -138,6 +207,7 @@ namespace SimulatorForms
                 reiniciar = false; // la simulación seguirá desde la posición guardada
                 MessageBox.Show("Se han cargado " + lista.GetNumber() + " vuelos. Abre Simulación para continuar.");
             }
+            ActualizarContador();
         }
     }
 }

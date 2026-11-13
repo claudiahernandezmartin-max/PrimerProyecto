@@ -9,9 +9,22 @@ namespace SimulatorForms
         double ciclo;
         bool aceptado = false;
 
+        Estilo estilo = new Estilo();
+
         public ParametrosForm()
         {
             InitializeComponent();
+
+            // Aspecto de la ventana (igual que el login)
+            estilo.PonerDialogo(this, "Parámetros");
+            estilo.PonerEtiqueta(label1);
+            estilo.PonerEtiqueta(label2);
+            estilo.PonerCaja(TextBoxDistancia);
+            estilo.PonerCaja(TextBoxCiclo);
+            estilo.PonerBotonConIcono(button1, "varita", false);
+            estilo.PonerBotonConIcono(buttonAceptar, "aceptar", true);
+            this.AcceptButton = buttonAceptar;   // con la tecla Enter se pulsa Aceptar
+            estilo.PonerCabecera(this, "Parámetros", "Ajusta la simulación", true);
         }
 
         // Pone en las cajas los valores que hay ahora

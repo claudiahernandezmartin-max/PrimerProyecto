@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using FlightLib;
 
@@ -6,6 +7,8 @@ namespace SimulatorForms
 {
     public partial class DistanceForm : Form
     {
+        Estilo estilo = new Estilo();
+
         public DistanceForm(FlightPlanList lista, int seleccionado)
         {
             InitializeComponent();
@@ -27,6 +30,14 @@ namespace SimulatorForms
             }
 
             lblDistancia.Text = texto;
+
+            // Aspecto de la ventana: la ventana se ajusta al tamaño del texto
+            estilo.PonerDialogo(this, "Distancias");
+            lblDistancia.Font = new Font("Segoe UI", 12);
+            lblDistancia.ForeColor = estilo.ColorTexto;
+            lblDistancia.Location = new Point(28, 24);
+            this.ClientSize = new Size(Math.Max(380, lblDistancia.PreferredSize.Width + 56), lblDistancia.PreferredSize.Height + 48);
+            estilo.PonerCabecera(this, "Distancias", "Vuelo seleccionado: " + plan.GetId(), true);
         }
     }
 }

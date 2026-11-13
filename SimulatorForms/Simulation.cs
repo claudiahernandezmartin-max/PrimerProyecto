@@ -19,6 +19,7 @@ namespace SimulatorForms
         public Simulation(FlightPlanList lista, double distanciaSeguridad, double tiempoCiclo)
         {
             InitializeComponent();
+            AplicarEstilo();
 
             this.lista = lista;
             this.distanciaSeguridad = distanciaSeguridad;
@@ -34,12 +35,41 @@ namespace SimulatorForms
         {
         }
 
+        // Aspecto de la ventana: cabecera, botones con icono y tabla con los colores del programa
+        private void AplicarEstilo()
+        {
+            estilo.PonerDialogo(this, "Simulación");
+            panelSimulacion.BackColor = Color.White;
+
+            estilo.PonerBotonConIcono(buttonIniciar, "play", true);
+            estilo.PonerBotonConIcono(buttonDetener, "stop", false);
+            estilo.PonerBotonConIcono(buttonMover, "mover", false);
+            buttonDeshacer.Text = "Deshacer";
+            estilo.PonerBotonConIcono(buttonDeshacer, "atras", false);
+            estilo.PonerBotonConIcono(button1, "restart", false);
+            estilo.PonerBotonConIcono(buttonGuardar, "guardar", false);
+            estilo.PonerBotonConIcono(buttonVelocidadesOriginales, "restart", false);
+            estilo.PonerBotonConIcono(buttonVerDatos, "datos", false);
+            estilo.PonerBotonConIcono(Conflicte, "alerta", false);
+
+            estilo.PonerEtiqueta(label1);
+            label1.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            estilo.PonerEtiqueta(labelDistancia);
+            estilo.PonerEtiqueta(labelEstado);
+            labelEstado.Font = new Font("Segoe UI", 10, FontStyle.Bold);   // el color lo pone ActualizarEstado
+            estilo.PonerTabla(dataGridViewVelocidades);
+
+            estilo.PonerCabecera(this, "Simulación", "Controla los vuelos y detecta conflictos", true);
+        }
+
         private void panelSimulacion_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // bordes suaves
 
-            g.DrawRectangle(Pens.Black, 0, 0,
+            // Cuadrícula suave (cada 50 unidades) y borde del panel
+            estilo.DibujarCuadricula(g, panelSimulacion.Width, panelSimulacion.Height, 50);
+            g.DrawRectangle(Pens.LightSteelBlue, 0, 0,
                 panelSimulacion.Width - 1,
                 panelSimulacion.Height - 1);
 

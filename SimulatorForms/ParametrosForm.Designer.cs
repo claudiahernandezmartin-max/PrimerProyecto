@@ -39,7 +39,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(254, 193);
+            this.label2.Location = new System.Drawing.Point(30, 82);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(104, 16);
             this.label2.TabIndex = 1;
@@ -47,23 +47,23 @@
             // 
             // TextBoxDistancia
             // 
-            this.TextBoxDistancia.Location = new System.Drawing.Point(398, 129);
+            this.TextBoxDistancia.Location = new System.Drawing.Point(250, 28);
             this.TextBoxDistancia.Name = "TextBoxDistancia";
-            this.TextBoxDistancia.Size = new System.Drawing.Size(100, 22);
+            this.TextBoxDistancia.Size = new System.Drawing.Size(160, 27);
             this.TextBoxDistancia.TabIndex = 2;
             // 
             // TextBoxCiclo
             // 
-            this.TextBoxCiclo.Location = new System.Drawing.Point(398, 193);
+            this.TextBoxCiclo.Location = new System.Drawing.Point(250, 78);
             this.TextBoxCiclo.Name = "TextBoxCiclo";
-            this.TextBoxCiclo.Size = new System.Drawing.Size(100, 22);
+            this.TextBoxCiclo.Size = new System.Drawing.Size(160, 27);
             this.TextBoxCiclo.TabIndex = 3;
             // 
             // buttonAceptar
             // 
-            this.buttonAceptar.Location = new System.Drawing.Point(407, 272);
+            this.buttonAceptar.Location = new System.Drawing.Point(230, 134);
             this.buttonAceptar.Name = "buttonAceptar";
-            this.buttonAceptar.Size = new System.Drawing.Size(75, 23);
+            this.buttonAceptar.Size = new System.Drawing.Size(180, 46);
             this.buttonAceptar.TabIndex = 4;
             this.buttonAceptar.Text = "Aceptar";
             this.buttonAceptar.UseVisualStyleBackColor = true;
@@ -72,7 +72,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(212, 135);
+            this.label1.Location = new System.Drawing.Point(30, 32);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(146, 16);
             this.label1.TabIndex = 5;
@@ -80,9 +80,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(257, 272);
+            this.button1.Location = new System.Drawing.Point(30, 134);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(109, 23);
+            this.button1.Size = new System.Drawing.Size(180, 46);
             this.button1.TabIndex = 6;
             this.button1.Text = "Autorellenado";
             this.button1.UseVisualStyleBackColor = true;
@@ -92,7 +92,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(440, 200);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonAceptar);

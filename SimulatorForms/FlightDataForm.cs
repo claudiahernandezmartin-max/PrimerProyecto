@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using FlightLib;
 
@@ -8,10 +9,12 @@ namespace SimulatorForms
     public partial class FlightDataForm : Form
     {
         FlightPlanList lista;
+        Estilo estilo = new Estilo();
 
         public FlightDataForm(FlightPlanList lista)
         {
             InitializeComponent();
+            AplicarEstilo();
 
             this.lista = lista;
 
@@ -21,6 +24,16 @@ namespace SimulatorForms
         public FlightDataForm()
         {
             InitializeComponent();
+            AplicarEstilo();
+        }
+
+        // Aspecto de la ventana: cabecera y tabla con los colores del programa
+        private void AplicarEstilo()
+        {
+            estilo.PonerVentana(this, "Datos de vuelo");
+            this.ClientSize = new Size(780, 440);
+            estilo.PonerTabla(dataGridViewVuelos);
+            estilo.PonerCabecera(this, "Datos de vuelo", "Pulsa un vuelo para ver sus distancias", false);
         }
 
         private void CargarDatos()

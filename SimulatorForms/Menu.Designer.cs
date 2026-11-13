@@ -28,100 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.cargarPlanesDesdeFicheroToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.simulacionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.planesDeVueloToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cargarVuelosDePruebaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.continuarSimulaciónGuardadaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cargarPlanesDesdeFicheroToolStripMenuItem,
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem,
-            this.simulacionToolStripMenuItem,
-            this.planesDeVueloToolStripMenuItem,
-            this.cargarVuelosDePruebaToolStripMenuItem,
-            this.continuarSimulaciónGuardadaToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(1376, 26);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // cargarPlanesDesdeFicheroToolStripMenuItem
-            // 
-            this.cargarPlanesDesdeFicheroToolStripMenuItem.Name = "cargarPlanesDesdeFicheroToolStripMenuItem";
-            this.cargarPlanesDesdeFicheroToolStripMenuItem.Size = new System.Drawing.Size(208, 24);
-            this.cargarPlanesDesdeFicheroToolStripMenuItem.Text = "Cargar planes desde fichero";
-            this.cargarPlanesDesdeFicheroToolStripMenuItem.Click += new System.EventHandler(this.cargarPlanesDesdeFicheroToolStripMenuItem_Click);
-            // 
-            // distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem
-            // 
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Name = "distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem";
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Size = new System.Drawing.Size(294, 24);
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Text = "Distancia de seguridad y tiempo de ciclo";
-            this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem.Click += new System.EventHandler(this.distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem_Click);
-            // 
-            // simulacionToolStripMenuItem
-            // 
-            this.simulacionToolStripMenuItem.Name = "simulacionToolStripMenuItem";
-            this.simulacionToolStripMenuItem.Size = new System.Drawing.Size(96, 24);
-            this.simulacionToolStripMenuItem.Text = "Simulación";
-            this.simulacionToolStripMenuItem.Click += new System.EventHandler(this.simulacionToolStripMenuItem_Click);
-            // 
-            // planesDeVueloToolStripMenuItem
-            // 
-            this.planesDeVueloToolStripMenuItem.Name = "planesDeVueloToolStripMenuItem";
-            this.planesDeVueloToolStripMenuItem.Size = new System.Drawing.Size(126, 24);
-            this.planesDeVueloToolStripMenuItem.Text = "Planes de vuelo";
-            this.planesDeVueloToolStripMenuItem.Click += new System.EventHandler(this.planesDeVueloToolStripMenuItem_Click);
-            // 
-            // cargarVuelosDePruebaToolStripMenuItem
-            // 
-            this.cargarVuelosDePruebaToolStripMenuItem.Name = "cargarVuelosDePruebaToolStripMenuItem";
-            this.cargarVuelosDePruebaToolStripMenuItem.Size = new System.Drawing.Size(185, 24);
-            this.cargarVuelosDePruebaToolStripMenuItem.Text = "Cargar vuelos de prueba";
-            this.cargarVuelosDePruebaToolStripMenuItem.Click += new System.EventHandler(this.cargarVuelosDePruebaToolStripMenuItem_Click);
-            // 
-            // continuarSimulaciónGuardadaToolStripMenuItem
-            // 
-            this.continuarSimulaciónGuardadaToolStripMenuItem.Name = "continuarSimulaciónGuardadaToolStripMenuItem";
-            this.continuarSimulaciónGuardadaToolStripMenuItem.Size = new System.Drawing.Size(230, 24);
-            this.continuarSimulaciónGuardadaToolStripMenuItem.Text = "Continuar simulación guardada";
-            this.continuarSimulaciónGuardadaToolStripMenuItem.Click += new System.EventHandler(this.continuarSimulacionGuardadaToolStripMenuItem_Click);
             // 
             // Menu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1376, 508);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
+            this.ClientSize = new System.Drawing.Size(720, 480);
             this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Menu";
             this.Text = "Deconflicting tool";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem planesDeVueloToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem distanciaDeSeguridadYTiempoDeCicloToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem simulacionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cargarPlanesDesdeFicheroToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cargarVuelosDePruebaToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem continuarSimulaciónGuardadaToolStripMenuItem;
     }
 }

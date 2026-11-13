@@ -38,9 +38,79 @@ namespace SimulatorForms
             yf.Text = p.GetFinalPosition().GetY().ToString();
         }
 
+        Estilo estilo = new Estilo();
+
         public FlightPlansInterface()
         {
             InitializeComponent();
+            AplicarEstilo();
+        }
+
+        // Aspecto de la ventana: cada vuelo va en su "tarjeta" blanca
+        private void AplicarEstilo()
+        {
+            estilo.PonerDialogo(this, "Planes de vuelo");
+
+            Label[] etiquetas = { label1, label2, label3, label4, label5, label6, label7, label8, label9, label10, label11, label12 };
+            int i = 0;
+            while (i < etiquetas.Length)
+            {
+                estilo.PonerEtiqueta(etiquetas[i]);
+                etiquetas[i].BackColor = Color.Transparent;   // para que se vea la tarjeta blanca detrás
+                i++;
+            }
+
+            TextBox[] cajas = { FP1_id, FP1_vel, FP1_xi, FP1_yi, FP1_xf, FP1_yf, FP2_id, FP2_vel, FP2_xi, FP2_yi, FP2_xf, FP2_yf };
+            i = 0;
+            while (i < cajas.Length)
+            {
+                estilo.PonerCaja(cajas[i]);
+                i++;
+            }
+
+            FlightPlan1Label.Text = "Vuelo 1";
+            FlightPlan2Label.Text = "Vuelo 2";
+            Label[] titulos = { FlightPlan1Label, FlightPlan2Label };
+            i = 0;
+            while (i < titulos.Length)
+            {
+                titulos[i].Font = new Font("Segoe UI", 13, FontStyle.Bold);
+                titulos[i].ForeColor = estilo.ColorAzul;
+                titulos[i].BackColor = Color.Transparent;
+                i++;
+            }
+
+            AcceptButtonFlightplans.Text = "Aceptar";
+            estilo.PonerBotonConIcono(AcceptButtonFlightplans, "aceptar", true);
+            estilo.PonerBotonConIcono(button1, "varita", false);
+            estilo.PonerBotonConIcono(buttonOchoVuelos, "planes", false);
+            this.AcceptButton = AcceptButtonFlightplans;
+
+            this.Paint += new PaintEventHandler(FlightPlansInterface_Paint);
+            estilo.PonerCabecera(this, "Planes de vuelo", "Introduce los datos de los dos vuelos", true);
+        }
+
+        // Dibuja las dos tarjetas blancas detrás de los campos de cada vuelo
+        private void FlightPlansInterface_Paint(object sender, PaintEventArgs e)
+        {
+            Control[] vuelo1 = { FlightPlan1Label, FP1_id, FP1_yf, label1, label6 };
+            Control[] vuelo2 = { FlightPlan2Label, FP2_id, FP2_yf, label7, label12 };
+            estilo.DibujarTarjetaFondo(e.Graphics, CajaDe(vuelo1));
+            estilo.DibujarTarjetaFondo(e.Graphics, CajaDe(vuelo2));
+        }
+
+        // Rectángulo que rodea a un grupo de controles, con un poco de margen
+        private Rectangle CajaDe(Control[] controles)
+        {
+            Rectangle r = controles[0].Bounds;
+            int i = 1;
+            while (i < controles.Length)
+            {
+                r = Rectangle.Union(r, controles[i].Bounds);
+                i++;
+            }
+            r.Inflate(20, 16);
+            return r;
         }
 
         private void AcceptButtonFlightplans_Click(object sender, EventArgs e)
@@ -64,7 +134,7 @@ namespace SimulatorForms
                 double yf2 = Convert.ToDouble(FP2_yf.Text);
 
                 // Comprobaciones ANTES de crear los vuelos
-                
+
                 if (id1 == "" || id2 == "")
                 {
                     MessageBox.Show("Los dos vuelos necesitan un identificador.");
