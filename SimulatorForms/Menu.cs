@@ -220,6 +220,8 @@ namespace SimulatorForms
         private void cargarPlanesDesdeFicheroToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialogo = new OpenFileDialog();
+            dialogo.RestoreDirectory = true;   
+            // al cerrar, vuelve a la carpeta del programa
 
             if (dialogo.ShowDialog() == DialogResult.OK)
             {
@@ -252,7 +254,7 @@ namespace SimulatorForms
         // Carga el fichero de prueba sin tener que buscarlo (está en bin\Debug, junto al programa)
         private void cargarVuelosDePruebaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int resultado = lista.CargarFichero("Fichero Vuelos Prueba.txt");
+            int resultado = lista.CargarFichero("Todos los documentos\\Fichero Vuelos Prueba.txt");
 
             if (resultado == -1)
             {
@@ -273,7 +275,7 @@ namespace SimulatorForms
         // Carga los vuelos que se guardaron con el botón Guardar, para seguir donde se dejó
         private void continuarSimulacionGuardadaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int resultado = lista.CargarFichero("vuelos_guardados.txt");
+            int resultado = lista.CargarFichero("Todos los documentos\\vuelos_guardados.txt");
 
             if (resultado == -1)
             {

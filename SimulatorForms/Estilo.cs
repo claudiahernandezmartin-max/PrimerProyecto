@@ -275,37 +275,32 @@ namespace SimulatorForms
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
             Rectangle sombra = new Rectangle(r.X, r.Y + 2, r.Width, r.Height);
-            using (GraphicsPath ruta = RectRedondo(sombra, 12))
-            using (SolidBrush pincelSombra = new SolidBrush(Color.FromArgb(18, 11, 31, 58)))
-            {
-                g.FillPath(pincelSombra, ruta);
-            }
-            using (GraphicsPath ruta = RectRedondo(r, 12))
-            using (SolidBrush fondo = new SolidBrush(Color.White))
-            using (Pen borde = new Pen(Color.FromArgb(220, 227, 238), 1))
-            {
-                g.FillPath(fondo, ruta);
-                g.DrawPath(borde, ruta);
-            }
+            GraphicsPath rutaSombra = RectRedondo(sombra, 12);
+            SolidBrush pincelSombra = new SolidBrush(Color.FromArgb(18, 11, 31, 58));
+            g.FillPath(pincelSombra, rutaSombra);
+
+            GraphicsPath ruta = RectRedondo(r, 12);
+            SolidBrush fondo = new SolidBrush(Color.White);
+            Pen borde = new Pen(Color.FromArgb(220, 227, 238), 1);
+            g.FillPath(fondo, ruta);
+            g.DrawPath(borde, ruta);
         }
 
         // Cuadrícula suave para el panel de la simulación (como una pantalla de radar)
         public void DibujarCuadricula(Graphics g, int ancho, int alto, int paso)
         {
-            using (Pen lapiz = new Pen(Color.FromArgb(232, 237, 245), 1))
+            Pen lapiz = new Pen(Color.FromArgb(232, 237, 245), 1);
+            int x = paso;
+            while (x < ancho)
             {
-                int x = paso;
-                while (x < ancho)
-                {
-                    g.DrawLine(lapiz, x, 0, x, alto);
-                    x = x + paso;
-                }
-                int y = paso;
-                while (y < alto)
-                {
-                    g.DrawLine(lapiz, 0, y, ancho, y);
-                    y = y + paso;
-                }
+                g.DrawLine(lapiz, x, 0, x, alto);
+                x = x + paso;
+            }
+            int y = paso;
+            while (y < alto)
+            {
+                g.DrawLine(lapiz, 0, y, ancho, y);
+                y = y + paso;
             }
         }
 
