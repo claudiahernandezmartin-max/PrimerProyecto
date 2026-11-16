@@ -16,7 +16,6 @@ namespace SimulatorForms
         int tamanoAvion = 32;   // lado en píxeles de cada PictureBox
         Estilo estilo = new Estilo();   // colores y dibujos de la simulación
         bool alarmaMostrada = false;    // para que la alarma salte una sola vez por cada conflicto
-
         public Simulation(FlightPlanList lista, double distanciaSeguridad, double tiempoCiclo)
         {
             InitializeComponent();
@@ -28,7 +27,7 @@ namespace SimulatorForms
 
             CrearAviones();
             ColocarAviones();
-            CargarTablaVelocidades();  // ← NUEVO: rellena la tabla de velocidades (punto 18)
+            CargarTablaVelocidades();
             ActualizarEstado();
         }
 
@@ -156,14 +155,18 @@ namespace SimulatorForms
                 if (alarmaMostrada == false)
                 {
                     alarmaMostrada = true;
-                    MessageBox.Show(string.Format("¡ALARMA! Los vuelos {0} y {1} están a {2:F2}, menos que la distancia de seguridad ({3:F2}).",
-                        lista.GetFlightPlan(p).GetId(), lista.GetFlightPlan(q).GetId(), dActual, distanciaSeguridad),
-                        "Alarma de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // Un solo mensaje con todas las parejas que están en conflicto ahora
+                    List<string> parejas = lista.ParejasConflictoFuturo(distanciaSeguridad);
+                    string texto = "¡ALARMA! Estos vuelos están a menos de la distancia de seguridad (" + distanciaSeguridad + "):\n\n";
+                    for (int i = 0; i < parejas.Count; i++)
+                    {
+                        texto = texto + "   •  " + parejas[i] + "\n";
+                    }
+                    MessageBox.Show(texto, "Alarma de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             else if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
-                alarmaMostrada = false;
                 int a = lista.GetConflictoA();
                 int b = lista.GetConflictoB();
                 labelEstado.Text = string.Format("Aviso: {0} y {1} entrarán en conflicto (dist. mínima {2:F2} dentro de {3:F1} ciclos)",
@@ -172,7 +175,6 @@ namespace SimulatorForms
             }
             else
             {
-                alarmaMostrada = false;
                 labelEstado.Text = "No habrá conflicto";
                 labelEstado.ForeColor = Color.Green;
             }
@@ -364,7 +366,8 @@ namespace SimulatorForms
         private void Restart_Click(object sender, EventArgs e)
         {
             timerSimulacion.Stop();
-            lista.Restart();            // ← en vez de plan1.Restart(); plan2.Restart();
+            lista.Restart();
+            alarmaMostrada = false;     // al volver a empezar, la alarma puede volver a salir una vez            
             ColocarAviones();
 
             buttonIniciar.Enabled = true;
