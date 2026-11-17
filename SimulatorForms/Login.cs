@@ -13,7 +13,7 @@ namespace SimulatorForms
 {
     public partial class Login : Form
     {
-        GestionUsuarios gestor = new GestionUsuarios("usuarios.db");
+        GestionUsuarios gestor = new GestionUsuarios("Todos los documentos\\usuarios.db");
         bool aceptado = false;
         Estilo estilo = new Estilo();
         public Login()
