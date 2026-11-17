@@ -54,6 +54,12 @@ namespace SimulatorForms
                 MessageBox.Show("Escribe el usuario y la contraseña.");
                 return;
             }
+            // La contraseña tiene que tener al menos 4 caracteres
+            if (textBoxPassword.Text.Length < 4)
+            {
+                MessageBox.Show("La contraseña tiene que tener como mínimo 4 caracteres.");
+                return;
+            }
             if (textBoxPassword.Text != textBoxRepetir.Text)
             {
                 MessageBox.Show("Las dos contraseñas no son iguales.");
