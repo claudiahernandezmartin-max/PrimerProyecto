@@ -280,25 +280,6 @@ namespace FlightLib
             return false; 
         }
 
-        // Busca todas las parejas de vuelos que están o estarán en conflicto si siguen como van
-        // Devuelve una lista con el texto de cada pareja y lo cerca que pasarán
-        public List<string> ParejasConflictoFuturo(double D)
-        {
-            List<string> parejas = new List<string>();
-            for (int i = 0; i < vuelos.Count; i++)
-            {
-                for (int j = i + 1; j < vuelos.Count; j++)
-                {
-                    double d = vuelos[i].DistanciaMinima(vuelos[j]);
-                    if (d < D)
-                    {
-                        parejas.Add(vuelos[i].GetId() + " y " + vuelos[j].GetId() + " (se acercan a " + d.ToString("F2") + ")");
-                    }
-                }
-            }
-            return parejas;
-        }
-
         // Busca la primera pareja de vuelos que entrará en conflicto si siguen como van
         // Guarda la pareja, la distancia mínima y el instante, lo miramos con los Get de abajo
         // Devuelve true si ha encontrado alguna

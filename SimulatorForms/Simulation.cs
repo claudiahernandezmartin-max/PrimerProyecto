@@ -15,7 +15,6 @@ namespace SimulatorForms
         List<PictureBox> aviones = new List<PictureBox>();   // un PictureBox por vuelo
         int tamanoAvion = 32;   // lado en píxeles de cada PictureBox
         Estilo estilo = new Estilo();   // colores y dibujos de la simulación
-        bool alarmaMostrada = false;    // para que la alarma salte una sola vez por cada conflicto
         public Simulation(FlightPlanList lista, double distanciaSeguridad, double tiempoCiclo)
         {
             InitializeComponent();
@@ -149,21 +148,7 @@ namespace SimulatorForms
             if (lista.HayConflicto(distanciaSeguridad))
             {
                 labelEstado.Text = "CONFLICTO Hay vuelos a menos de la distancia de seguridad";
-                labelEstado.ForeColor = Color.Red;
-
-                // Alarma: solo la primera vez que aparece el conflicto
-                if (alarmaMostrada == false)
-                {
-                    alarmaMostrada = true;
-                    // Un solo mensaje con todas las parejas que están en conflicto ahora
-                    List<string> parejas = lista.ParejasConflictoFuturo(distanciaSeguridad);
-                    string texto = "¡ALARMA! Estos vuelos están a menos de la distancia de seguridad (" + distanciaSeguridad + "):\n\n";
-                    for (int i = 0; i < parejas.Count; i++)
-                    {
-                        texto = texto + "   •  " + parejas[i] + "\n";
-                    }
-                    MessageBox.Show(texto, "Alarma de conflicto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                labelEstado.ForeColor = Color.Red; 
             }
             else if (lista.BuscarConflictoFuturo(distanciaSeguridad))
             {
@@ -367,7 +352,6 @@ namespace SimulatorForms
         {
             timerSimulacion.Stop();
             lista.Restart();
-            alarmaMostrada = false;     // al volver a empezar, la alarma puede volver a salir una vez            
             ColocarAviones();
 
             buttonIniciar.Enabled = true;
